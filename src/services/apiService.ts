@@ -145,12 +145,12 @@ export async function fetchEarthquakes(lat: number, lon: number): Promise<Earthq
     const data = await res.json();
     const count = data?.features?.length ?? 12;
     const sev = earthquakeSeverity(count);
-    return { count, severity: sev, score: severityToScore[sev], source: "USGS Earthquake Catalog" };
+    return { count, severity: sev, score: severityToScore[sev], source: "USGS Earthquake Catalog", status: "LIVE" };
   } catch {
     // silent fallback
   }
   const sev = earthquakeSeverity(12);
-  return { count: 12, severity: sev, score: severityToScore[sev], source: "USGS Earthquake Catalog (fallback)" };
+  return { count: 12, severity: sev, score: severityToScore[sev], source: "USGS Earthquake Catalog (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 4 — Climate data
