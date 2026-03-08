@@ -17,7 +17,8 @@ function riskLabel(pct: number): { risk: string; color: string } {
   if (pct <= 0.15) return { risk: "LOW-MEDIUM", color: "bg-yellow-500" };
   if (pct <= 0.30) return { risk: "MEDIUM", color: "bg-orange-500" };
   if (pct <= 0.50) return { risk: "HIGH", color: "bg-red-500" };
-  return { risk: "VERY HIGH", color: "bg-red-800" };
+  if (pct <= 0.70) return { risk: "VERY HIGH", color: "bg-red-800" };
+  return { risk: "EXTREME", color: "bg-purple-950" };
 }
 
 interface FinancialRiskSectionProps {
