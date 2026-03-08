@@ -33,8 +33,10 @@ interface AssetDetailsPanelProps {
   onFormStateChange: (state: AssetFormState) => void;
 }
 
-const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyzing, formState, onFormStateChange }: AssetDetailsPanelProps) => {
-  const update = (patch: Partial<AssetFormState>) => onFormStateChange({ ...formState, ...patch });
+const DEFAULT_FORM: AssetFormState = { propertyName: "", propertyType: "", constructionYear: "", country: "" };
+
+const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyzing, formState = DEFAULT_FORM, onFormStateChange }: AssetDetailsPanelProps) => {
+  const update = (patch: Partial<AssetFormState>) => onFormStateChange?.({ ...formState, ...patch });
 
   const handleAnalyze = () => {
     if (!formState.propertyName.trim()) {
