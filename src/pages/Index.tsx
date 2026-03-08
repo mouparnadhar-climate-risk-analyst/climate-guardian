@@ -13,6 +13,7 @@ import EstimatedWarningCard from "@/components/EstimatedWarningCard";
 import MobileStickyBar from "@/components/MobileStickyBar";
 import Footer from "@/components/Footer";
 import DisasterScenarios from "@/components/DisasterScenarios";
+import PrintReportPage2 from "@/components/PrintReportPage2";
 import { runFullAnalysis, type AnalysisResult } from "@/services/apiService";
 
 const INITIAL_FORM: AssetFormState = {
