@@ -8,7 +8,7 @@ interface MobileStickyBarProps {
 
 const MobileStickyBar = ({ onAnalyze, isAnalyzing }: MobileStickyBarProps) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border bg-background/90 backdrop-blur-xl p-3">
+    <div data-mobile-sticky className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border bg-background/90 backdrop-blur-xl p-3">
       <Button
         onClick={onAnalyze}
         disabled={isAnalyzing}

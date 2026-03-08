@@ -47,7 +47,7 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyz
   };
 
   return (
-    <motion.div
+    <motion.div id="asset-details-panel"
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
