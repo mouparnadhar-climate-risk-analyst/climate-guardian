@@ -73,11 +73,15 @@
 @media print {
   @page { size: A4 portrait; margin: 1cm; }
 
-  /* Force everything to stack normally, break out of flex/grid */
-  body, main, section, div {
-    display: block !important;
+  /* 1. Kill all screen-height constraints and scroll locks on the root */
+  html, body, #root, main, .min-h-screen {
     height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    width: 100% !important;
     overflow: visible !important;
+    position: static !important;
+    display: block !important;
   }
 
   /* Force dark background and white text */
@@ -94,27 +98,40 @@
     print-color-adjust: exact !important;
   }
 
-  /* Hide the inputs, navbar, footer, and buttons */
+  /* Hide UI elements not needed in the report */
   nav, footer, form, button, .input-panel-wrapper,
   #asset-details-panel,
   [data-mobile-sticky] {
     display: none !important;
   }
 
-  /* Force the MAP to have a static height so it doesn't disappear */
-  .leaflet-container, [data-testid="map-container"] {
+  /* 2. Force grid and flex containers to stack blocks vertically */
+  .grid, .flex, .flex-row, .grid-cols-2 {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* 3. Give the Map and Chart hardcoded physical heights for paper */
+  .leaflet-container, .recharts-wrapper {
+    height: 300px !important;
+    min-height: 300px !important;
+    width: 100% !important;
+    display: block !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 20px !important;
+  }
+
+  [data-testid="map-container"] {
     height: 400px !important;
     width: 100% !important;
     display: block !important;
     page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
-  /* Ensure Charts and Cards don't get cut in half */
-  .recharts-wrapper, table, .kpi-card, .risk-card,
-  [class*="card"] {
+  /* 4. Ensure KPI cards, tables, and risk cards fit the width */
+  table, .kpi-card, .risk-card, [class*="card"] {
+    width: 100% !important;
     page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
   /* Full-width clean layout */
