@@ -4,6 +4,7 @@ export interface GeoLocation {
   lat: number;
   lng: number;
   displayName: string;
+  status: DataStatus;
 }
 
 export type DataStatus = "LIVE" | "ESTIMATED";
