@@ -232,15 +232,15 @@ export async function fetchRiverProximity(lat: number, lon: number): Promise<Pro
       }
       const km = minDist === Infinity ? 4 : Math.round(minDist * 10) / 10;
       const sev = riverSeverity(km);
-      return { distanceKm: km, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)" };
+      return { distanceKm: km, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)", status: "LIVE" };
     }
     const sev = riverSeverity(15);
-    return { distanceKm: 15, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)" };
+    return { distanceKm: 15, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)", status: "LIVE" };
   } catch {
     // silent fallback
   }
   const sev = riverSeverity(4);
-  return { distanceKm: 4, severity: sev, score: severityToScore[sev], source: "Overpass API (fallback)" };
+  return { distanceKm: 4, severity: sev, score: severityToScore[sev], source: "Overpass API (fallback)", status: "ESTIMATED" };
 }
 
 function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
