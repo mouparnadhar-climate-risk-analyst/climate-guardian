@@ -108,12 +108,13 @@ export async function geocode(address: string): Promise<GeoLocation> {
         lat: parseFloat(data[0].lat),
         lng: parseFloat(data[0].lon),
         displayName: data[0].display_name,
+        status: "LIVE",
       };
     }
   } catch {
     // silent
   }
-  return { lat: 25.2048, lng: 55.2708, displayName: "Dubai, UAE (fallback)" };
+  return { lat: 25.2048, lng: 55.2708, displayName: "Dubai, UAE (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 2 — Elevation
