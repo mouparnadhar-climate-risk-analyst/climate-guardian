@@ -62,7 +62,7 @@ interface AssetDetailsPanelProps {
   onFormStateChange: (state: AssetFormState) => void;
 }
 
-const DEFAULT_FORM: AssetFormState = { propertyName: "", propertyType: "", constructionYear: "", country: "" };
+const DEFAULT_FORM: AssetFormState = { propertyName: "", propertyType: "", constructionYear: "", country: "", resilience: { floodBarriers: false, seismicRetrofit: false, heatReflective: false } };
 
 const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyzing, formState = DEFAULT_FORM, onFormStateChange }: AssetDetailsPanelProps) => {
   const update = (patch: Partial<AssetFormState>) => onFormStateChange?.({ ...formState, ...patch });
