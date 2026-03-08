@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { Shield, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -37,11 +39,18 @@ const countries = [
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 125 }, (_, i) => String(currentYear - i));
 
+export interface ResilienceChecks {
+  floodBarriers: boolean;
+  seismicRetrofit: boolean;
+  heatReflective: boolean;
+}
+
 export interface AssetFormState {
   propertyName: string;
   propertyType: string;
   constructionYear: string;
   country: string;
+  resilience: ResilienceChecks;
 }
 
 interface AssetDetailsPanelProps {
@@ -53,7 +62,7 @@ interface AssetDetailsPanelProps {
   onFormStateChange: (state: AssetFormState) => void;
 }
 
-const DEFAULT_FORM: AssetFormState = { propertyName: "", propertyType: "", constructionYear: "", country: "" };
+const DEFAULT_FORM: AssetFormState = { propertyName: "", propertyType: "", constructionYear: "", country: "", resilience: { floodBarriers: false, seismicRetrofit: false, heatReflective: false } };
 
 const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyzing, formState = DEFAULT_FORM, onFormStateChange }: AssetDetailsPanelProps) => {
   const update = (patch: Partial<AssetFormState>) => onFormStateChange?.({ ...formState, ...patch });
@@ -140,6 +149,40 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyz
             </SelectContent>
           </Select>
         </div>
+
+        <Accordion type="single" collapsible className="border border-border rounded-lg">
+          <AccordionItem value="resilience" className="border-none">
+            <AccordionTrigger className="px-3 py-2.5 text-xs md:text-sm text-muted-foreground hover:no-underline">
+              Building Structural Details (Optional)
+            </AccordionTrigger>
+            <AccordionContent className="px-3 space-y-3">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <Checkbox
+                  checked={formState.resilience?.floodBarriers ?? false}
+                  onCheckedChange={(v) => update({ resilience: { ...formState.resilience, floodBarriers: !!v } })}
+                  className="mt-0.5"
+                />
+                <span className="text-xs text-foreground">Flood Barriers / Elevated Utilities installed?</span>
+              </label>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <Checkbox
+                  checked={formState.resilience?.seismicRetrofit ?? false}
+                  onCheckedChange={(v) => update({ resilience: { ...formState.resilience, seismicRetrofit: !!v } })}
+                  className="mt-0.5"
+                />
+                <span className="text-xs text-foreground">Seismic Retrofitting (Dampers/Bracing)?</span>
+              </label>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <Checkbox
+                  checked={formState.resilience?.heatReflective ?? false}
+                  onCheckedChange={(v) => update({ resilience: { ...formState.resilience, heatReflective: !!v } })}
+                  className="mt-0.5"
+                />
+                <span className="text-xs text-foreground">Heat-Reflective Glass / Cool Roof?</span>
+              </label>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <Button
           onClick={handleAnalyze}

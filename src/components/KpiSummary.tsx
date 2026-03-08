@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { ShieldAlert, TrendingDown, ShieldCheck, FileText } from "lucide-react";
 import type { AnalysisResult } from "@/services/apiService";
+import type { ResilienceChecks } from "@/components/AssetDetailsPanel";
 
 const fmt = (n: number) =>
   "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
@@ -8,9 +9,10 @@ const fmt = (n: number) =>
 interface KpiSummaryProps {
   assetValue: string;
   analysisData?: AnalysisResult | null;
+  resilience?: ResilienceChecks;
 }
 
-const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
+const KpiSummary = ({ assetValue, analysisData, resilience }: KpiSummaryProps) => {
   const baseValue = useMemo(() => {
     const parsed = parseFloat(assetValue.replace(/[^0-9.]/g, ""));
     return isNaN(parsed) || parsed <= 0 ? 10_000_000 : parsed;
@@ -39,9 +41,16 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
     },
     {
       title: "Adaptation Budget",
-      value: fmt(baseValue * 0.08),
+      value: (() => {
+        let rate = 0.08;
+        const checks = [resilience?.floodBarriers, resilience?.seismicRetrofit, resilience?.heatReflective].filter(Boolean).length;
+        rate = Math.max(0.02, rate - checks * 0.015);
+        return fmt(baseValue * rate);
+      })(),
       valueClass: "text-emerald-400",
-      subtitle: "To reduce risk score to < 45",
+      subtitle: resilience && (resilience.floodBarriers || resilience.seismicRetrofit || resilience.heatReflective)
+        ? "Reduced — resilience measures in place"
+        : "To reduce risk score to < 45",
       icon: ShieldCheck,
     },
     {
