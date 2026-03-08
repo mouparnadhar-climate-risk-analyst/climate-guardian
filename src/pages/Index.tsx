@@ -4,6 +4,7 @@ import HeroSection from "@/components/HeroSection";
 import AssetDetailsPanel from "@/components/AssetDetailsPanel";
 import RiskMap from "@/components/RiskMap";
 import FinancialRiskSection from "@/components/FinancialRiskSection";
+import DisasterScenarios from "@/components/DisasterScenarios";
 
 const Index = () => {
   const [analysisLocation, setAnalysisLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -27,6 +28,7 @@ const Index = () => {
           </div>
         </div>
         <FinancialRiskSection assetValue={assetValue} />
+        <DisasterScenarios assetValue={assetValue} />
       </main>
     </div>
   );
