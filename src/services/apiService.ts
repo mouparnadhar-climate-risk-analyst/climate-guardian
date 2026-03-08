@@ -6,11 +6,14 @@ export interface GeoLocation {
   displayName: string;
 }
 
+export type DataStatus = "LIVE" | "ESTIMATED";
+
 export interface ElevationResult {
   elevation: number;
   severity: string;
   score: number;
   source: string;
+  status: DataStatus;
 }
 
 export interface EarthquakeResult {
