@@ -21,6 +21,7 @@ export interface EarthquakeResult {
   severity: string;
   score: number;
   source: string;
+  status: DataStatus;
 }
 
 export interface ClimateResult {
