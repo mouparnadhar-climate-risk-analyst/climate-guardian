@@ -190,7 +190,6 @@ export async function fetchCoastalProximity(lat: number, lon: number): Promise<P
     );
     const data = await res.json();
     if (data?.elements?.length > 0) {
-      // Estimate distance from first element's geometry
       let minDist = Infinity;
       for (const el of data.elements) {
         if (el.geometry) {
@@ -202,16 +201,15 @@ export async function fetchCoastalProximity(lat: number, lon: number): Promise<P
       }
       const km = minDist === Infinity ? 1.2 : Math.round(minDist * 10) / 10;
       const sev = coastalSeverity(km);
-      return { distanceKm: km, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)" };
+      return { distanceKm: km, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)", status: "LIVE" };
     }
-    // No coastline found within 10km
     const sev = coastalSeverity(15);
-    return { distanceKm: 15, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)" };
+    return { distanceKm: 15, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)", status: "LIVE" };
   } catch {
     // silent fallback
   }
   const sev = coastalSeverity(1.2);
-  return { distanceKm: 1.2, severity: sev, score: severityToScore[sev], source: "Overpass API (fallback)" };
+  return { distanceKm: 1.2, severity: sev, score: severityToScore[sev], source: "Overpass API (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 6 — River proximity
