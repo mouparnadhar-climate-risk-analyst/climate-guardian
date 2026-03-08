@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { Shield } from "lucide-react";
+import { Shield, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const propertyTypes = ["Commercial Office", "Residential", "Industrial", "Retail", "Mixed Use", "Data Center", "Warehouse"];
 
@@ -16,9 +17,42 @@ const countries = [
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 125 }, (_, i) => String(currentYear - i));
 
-const AssetDetailsPanel = () => {
+interface AssetDetailsPanelProps {
+  onAnalyze?: (location: { lat: number; lng: number }) => void;
+}
+
+const AssetDetailsPanel = ({ onAnalyze }: AssetDetailsPanelProps) => {
   const [propertyName, setPropertyName] = useState("");
   const [assetValue, setAssetValue] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleAnalyze = async () => {
+    if (!propertyName.trim()) {
+      toast.error("Please enter a property name or address.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(propertyName)}&limit=1`
+      );
+      const data = await res.json();
+
+      if (data.length === 0) {
+        toast.error("Location not found. Try a more specific address.");
+        return;
+      }
+
+      const { lat, lon } = data[0];
+      onAnalyze?.({ lat: parseFloat(lat), lng: parseFloat(lon) });
+      toast.success(`Analysis running for: ${data[0].display_name.split(",")[0]}`);
+    } catch {
+      toast.error("Geocoding failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <motion.div
@@ -34,9 +68,9 @@ const AssetDetailsPanel = () => {
 
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground text-sm">Property Name</Label>
+          <Label className="text-muted-foreground text-sm">Property Name / Address</Label>
           <Input
-            placeholder="e.g. Manhattan Tower A"
+            placeholder="e.g. Manhattan Tower A or 123 Main St, NYC"
             value={propertyName}
             onChange={(e) => setPropertyName(e.target.value)}
             className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
@@ -95,8 +129,13 @@ const AssetDetailsPanel = () => {
           </Select>
         </div>
 
-        <Button className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 glow-primary font-semibold text-base h-12 transition-all hover:glow-primary-intense">
-          Run Climate Risk Analysis
+        <Button
+          onClick={handleAnalyze}
+          disabled={loading}
+          className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 glow-primary font-semibold text-base h-12 transition-all hover:glow-primary-intense"
+        >
+          {loading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
+          {loading ? "Analyzing..." : "Run Climate Risk Analysis"}
         </Button>
       </div>
     </motion.div>
