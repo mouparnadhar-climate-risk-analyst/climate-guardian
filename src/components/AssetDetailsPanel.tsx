@@ -7,31 +7,41 @@ import { motion } from "framer-motion";
 import { Shield, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-const propertyTypes = ["Commercial Office", "Residential", "Industrial", "Retail", "Mixed Use", "Data Center", "Warehouse"];
+const propertyTypes = ["Commercial Office", "Residential", "Residential Villa", "Industrial", "Retail", "Mixed Use", "Data Center", "Warehouse"];
 
 const countries = [
   "United States", "United Kingdom", "Germany", "France", "Japan", "Australia",
-  "Canada", "India", "Brazil", "China", "Netherlands", "Singapore", "UAE",
+  "Canada", "India", "Brazil", "China", "Netherlands", "Singapore", "UAE/Dubai",
 ];
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 125 }, (_, i) => String(currentYear - i));
 
+export interface AssetFormState {
+  propertyName: string;
+  propertyType: string;
+  constructionYear: string;
+  country: string;
+}
+
 interface AssetDetailsPanelProps {
   onAnalyze?: (address: string) => void;
   assetValue: string;
   onAssetValueChange: (value: string) => void;
+  isAnalyzing?: boolean;
+  formState: AssetFormState;
+  onFormStateChange: (state: AssetFormState) => void;
 }
 
-const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange }: AssetDetailsPanelProps) => {
-  const [propertyName, setPropertyName] = useState("");
+const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyzing, formState, onFormStateChange }: AssetDetailsPanelProps) => {
+  const update = (patch: Partial<AssetFormState>) => onFormStateChange({ ...formState, ...patch });
 
   const handleAnalyze = () => {
-    if (!propertyName.trim()) {
+    if (!formState.propertyName.trim()) {
       toast.error("Please enter a property name or address.");
       return;
     }
-    onAnalyze?.(propertyName);
+    onAnalyze?.(formState.propertyName);
   };
 
   return (
@@ -39,38 +49,38 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange }: AssetD
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className="rounded-lg border border-border bg-card p-6 space-y-5"
+      className="rounded-lg border border-border bg-card p-4 md:p-6 space-y-4 md:space-y-5"
     >
       <div className="flex items-center gap-2 mb-2">
         <Shield className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">Asset Details</h2>
+        <h2 className="text-base md:text-lg font-semibold text-foreground">Asset Details</h2>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 md:space-y-4">
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground text-sm">Property Name / Address</Label>
+          <Label className="text-muted-foreground text-xs md:text-sm">Property Name / Address</Label>
           <Input
             placeholder="e.g. Manhattan Tower A or 123 Main St, NYC"
-            value={propertyName}
-            onChange={(e) => setPropertyName(e.target.value)}
-            className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
+            value={formState.propertyName}
+            onChange={(e) => update({ propertyName: e.target.value })}
+            className="bg-secondary border-border text-foreground placeholder:text-muted-foreground h-11 md:h-10"
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground text-sm">Asset Value ($)</Label>
+          <Label className="text-muted-foreground text-xs md:text-sm">Asset Value ($)</Label>
           <Input
             placeholder="e.g. 25,000,000"
             value={assetValue}
             onChange={(e) => onAssetValueChange(e.target.value)}
-            className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
+            className="bg-secondary border-border text-foreground placeholder:text-muted-foreground h-11 md:h-10"
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground text-sm">Property Type</Label>
-          <Select>
-            <SelectTrigger className="bg-secondary border-border text-foreground">
+          <Label className="text-muted-foreground text-xs md:text-sm">Property Type</Label>
+          <Select value={formState.propertyType} onValueChange={(v) => update({ propertyType: v })}>
+            <SelectTrigger className="bg-secondary border-border text-foreground h-11 md:h-10">
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border">
@@ -82,9 +92,9 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange }: AssetD
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground text-sm">Construction Year</Label>
-          <Select>
-            <SelectTrigger className="bg-secondary border-border text-foreground">
+          <Label className="text-muted-foreground text-xs md:text-sm">Construction Year</Label>
+          <Select value={formState.constructionYear} onValueChange={(v) => update({ constructionYear: v })}>
+            <SelectTrigger className="bg-secondary border-border text-foreground h-11 md:h-10">
               <SelectValue placeholder="Select year" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border max-h-60">
@@ -96,9 +106,9 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange }: AssetD
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-muted-foreground text-sm">Country</Label>
-          <Select>
-            <SelectTrigger className="bg-secondary border-border text-foreground">
+          <Label className="text-muted-foreground text-xs md:text-sm">Country</Label>
+          <Select value={formState.country} onValueChange={(v) => update({ country: v })}>
+            <SelectTrigger className="bg-secondary border-border text-foreground h-11 md:h-10">
               <SelectValue placeholder="Select country" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border">
@@ -111,9 +121,17 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange }: AssetD
 
         <Button
           onClick={handleAnalyze}
-          className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 glow-primary font-semibold text-base h-12 transition-all hover:glow-primary-intense"
+          disabled={isAnalyzing}
+          className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 glow-primary font-semibold text-sm md:text-base h-12 transition-all hover:glow-primary-intense"
         >
-          Run Climate Risk Analysis
+          {isAnalyzing ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Analyzing...
+            </>
+          ) : (
+            "Run Climate Risk Analysis"
+          )}
         </Button>
       </div>
     </motion.div>

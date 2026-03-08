@@ -10,7 +10,6 @@ const TILE_URL = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/{z}/{x}
 const DEFAULT_CENTER: [number, number] = [25.2048, 55.2708];
 const DEFAULT_ZOOM = 11;
 
-// Glowing cyan pin icon
 const cyanIcon = new L.DivIcon({
   className: "",
   html: `<div style="
@@ -44,30 +43,30 @@ function FlyToLocation({ location }: { location: { lat: number; lng: number } })
 }
 
 const MapLegend = () => (
-  <div className="absolute bottom-4 right-4 z-[1000] rounded-lg border border-border bg-card/90 backdrop-blur-sm p-3 space-y-2">
-    <p className="text-xs font-semibold text-foreground">Risk Zones</p>
+  <div className="absolute bottom-4 right-4 z-[1000] rounded-lg border border-border bg-card/90 backdrop-blur-sm p-2 md:p-3 space-y-1.5 md:space-y-2">
+    <p className="text-[10px] md:text-xs font-semibold text-foreground">Risk Zones</p>
     <div className="flex items-center gap-2">
-      <span className="block h-3 w-3 rounded-full bg-destructive/80" />
-      <span className="text-xs text-muted-foreground">Extreme (500m)</span>
+      <span className="block h-2.5 w-2.5 md:h-3 md:w-3 rounded-full bg-destructive/80" />
+      <span className="text-[10px] md:text-xs text-muted-foreground">Extreme (500m)</span>
     </div>
     <div className="flex items-center gap-2">
-      <span className="block h-3 w-3 rounded-full" style={{ background: "hsl(20 100% 60% / 0.8)" }} />
-      <span className="text-xs text-muted-foreground">High (1.5km)</span>
+      <span className="block h-2.5 w-2.5 md:h-3 md:w-3 rounded-full" style={{ background: "hsl(20 100% 60% / 0.8)" }} />
+      <span className="text-[10px] md:text-xs text-muted-foreground">High (1.5km)</span>
     </div>
     <div className="flex items-center gap-2">
-      <span className="block h-3 w-3 rounded-full" style={{ background: "hsl(50 100% 50% / 0.8)" }} />
-      <span className="text-xs text-muted-foreground">Moderate (3km)</span>
+      <span className="block h-2.5 w-2.5 md:h-3 md:w-3 rounded-full" style={{ background: "hsl(50 100% 50% / 0.8)" }} />
+      <span className="text-[10px] md:text-xs text-muted-foreground">Moderate (3km)</span>
     </div>
   </div>
 );
 
 const RiskMap = ({ analysisLocation }: RiskMapProps) => {
   return (
-    <div className="rounded-lg border border-border overflow-hidden h-full min-h-[400px] md:min-h-[520px] relative">
+    <div className="rounded-lg border border-border overflow-hidden h-[300px] md:h-[500px] relative">
       <MapContainer
         center={DEFAULT_CENTER}
         zoom={DEFAULT_ZOOM}
-        className="h-full w-full min-h-[400px] md:min-h-[520px]"
+        className="h-full w-full"
         zoomControl={false}
         attributionControl={true}
       >

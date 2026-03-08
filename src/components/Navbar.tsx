@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Wand2 } from "lucide-react";
 
 const VaultLogo = () => (
   <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -7,17 +8,29 @@ const VaultLogo = () => (
   </svg>
 );
 
-const Navbar = () => {
+interface NavbarProps {
+  onDemo?: () => void;
+}
+
+const Navbar = ({ onDemo }: NavbarProps) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="container flex h-14 md:h-16 items-center justify-between">
+        <div className="flex items-center gap-2 md:gap-3">
           <VaultLogo />
-          <span className="text-lg font-bold tracking-wider text-foreground">CLIMATEVAULT</span>
+          <span className="text-base md:text-lg font-bold tracking-wider text-foreground">CLIMATEVAULT</span>
         </div>
-        <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-          Try Demo
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all text-xs md:text-sm"
+            onClick={onDemo}
+          >
+            <Wand2 className="h-3.5 w-3.5 mr-1.5" />
+            Demo Mode
+          </Button>
+        </div>
       </div>
     </nav>
   );
