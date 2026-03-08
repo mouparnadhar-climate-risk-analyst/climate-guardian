@@ -83,7 +83,7 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange }: AssetD
           <Input
             placeholder="e.g. 25,000,000"
             value={assetValue}
-            onChange={(e) => setAssetValue(e.target.value)}
+            onChange={(e) => onAssetValueChange(e.target.value)}
             className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
           />
         </div>
