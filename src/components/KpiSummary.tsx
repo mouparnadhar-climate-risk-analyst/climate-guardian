@@ -41,9 +41,16 @@ const KpiSummary = ({ assetValue, analysisData, resilience }: KpiSummaryProps) =
     },
     {
       title: "Adaptation Budget",
-      value: fmt(baseValue * 0.08),
+      value: (() => {
+        let rate = 0.08;
+        const checks = [resilience?.floodBarriers, resilience?.seismicRetrofit, resilience?.heatReflective].filter(Boolean).length;
+        rate = Math.max(0.02, rate - checks * 0.015);
+        return fmt(baseValue * rate);
+      })(),
       valueClass: "text-emerald-400",
-      subtitle: "To reduce risk score to < 45",
+      subtitle: resilience && (resilience.floodBarriers || resilience.seismicRetrofit || resilience.heatReflective)
+        ? "Reduced — resilience measures in place"
+        : "To reduce risk score to < 45",
       icon: ShieldCheck,
     },
     {

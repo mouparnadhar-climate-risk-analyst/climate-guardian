@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import KpiSummary from "@/components/KpiSummary";
-import AssetDetailsPanel, { type AssetFormState } from "@/components/AssetDetailsPanel";
+import AssetDetailsPanel, { type AssetFormState, type ResilienceChecks } from "@/components/AssetDetailsPanel";
 import RiskMap from "@/components/RiskMap";
 import FinancialRiskSection from "@/components/FinancialRiskSection";
 import RiskFactors from "@/components/RiskFactors";
@@ -15,13 +15,23 @@ import Footer from "@/components/Footer";
 import DisasterScenarios from "@/components/DisasterScenarios";
 import PrintableReport from "@/components/PrintableReport";
 import { runFullAnalysis, type AnalysisResult } from "@/services/apiService";
+import { saveAnalysisToHistory, type HistoryEntry } from "@/services/historyService";
 
 const INITIAL_FORM: AssetFormState = {
   propertyName: "",
   propertyType: "",
   constructionYear: "",
   country: "",
+  resilience: { floodBarriers: false, seismicRetrofit: false, heatReflective: false },
 };
+
+function getResilienceReduction(r: ResilienceChecks): number {
+  let reduction = 0;
+  if (r.floodBarriers) reduction += 5;
+  if (r.seismicRetrofit) reduction += 5;
+  if (r.heatReflective) reduction += 5;
+  return reduction;
+}
 
 const Index = () => {
   const [analysisLocation, setAnalysisLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -41,15 +51,34 @@ const Index = () => {
       setLoadingStep(step);
     });
 
+    // Apply resilience reduction
+    const reduction = getResilienceReduction(formState.resilience);
+    if (reduction > 0) {
+      result.overallScore = Math.max(0, result.overallScore - reduction);
+      // Recompute risk level based on adjusted score
+      if (result.overallScore <= 30) { result.riskLevel = "LOW"; result.lossPerDecade = 0.03; }
+      else if (result.overallScore <= 60) { result.riskLevel = "MEDIUM"; result.lossPerDecade = 0.08; }
+      else if (result.overallScore <= 80) { result.riskLevel = "HIGH"; result.lossPerDecade = 0.16; }
+      else { result.riskLevel = "EXTREME"; result.lossPerDecade = 0.28; }
+    }
+
     setAnalysisLocation({ lat: result.location.lat, lng: result.location.lng });
     setAnalysisData(result);
     setIsAnalyzing(false);
 
-    // Scroll to KPI section after analysis
+    // Save to history
+    saveAnalysisToHistory({
+      propertyName: address,
+      assetValue: assetValue,
+      riskScore: result.overallScore,
+      riskLevel: result.riskLevel,
+      timestamp: Date.now(),
+    });
+
     setTimeout(() => {
       document.getElementById("kpi-summary")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 300);
-  }, []);
+  }, [formState.resilience, assetValue]);
 
   const handleRetry = () => {
     if (lastAddress.current) {
@@ -68,18 +97,25 @@ const Index = () => {
       propertyName: "Palm Jumeirah Villa, Dubai",
       propertyType: "Residential Villa",
       constructionYear: "2005",
-      country: "UAE/Dubai",
+      country: "UAE",
+      resilience: { floodBarriers: false, seismicRetrofit: false, heatReflective: false },
     });
     setAssetValue("5000000");
   };
 
+  const handleHistorySelect = (entry: HistoryEntry) => {
+    setFormState((prev) => ({ ...prev, propertyName: entry.propertyName }));
+    setAssetValue(entry.assetValue);
+    handleAnalyze(entry.propertyName);
+  };
+
   return (
     <div className="min-h-screen bg-transparent pb-16 md:pb-0">
-      <Navbar onDemo={handleDemo} />
+      <Navbar onDemo={handleDemo} onHistorySelect={handleHistorySelect} />
       <HeroSection />
       <main className="container pb-12 px-4 md:px-6">
         <div id="report-capture-area">
-          <KpiSummary assetValue={assetValue} analysisData={analysisData} />
+          <KpiSummary assetValue={assetValue} analysisData={analysisData} resilience={formState.resilience} />
           {analysisData && (
             <EstimatedWarningCard data={analysisData} onRetry={handleRetry} />
           )}
