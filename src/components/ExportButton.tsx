@@ -4,12 +4,125 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import type { AnalysisResult } from "@/services/apiService";
+
+interface RiskInsight {
+  name: string;
+  score: number;
+  severity: string;
+  lossPercent: string;
+  operationalImpact: string;
+  recommendedAction: string;
+}
+
+function buildRiskInsights(data: AnalysisResult): RiskInsight[] {
+  const risks: RiskInsight[] = [
+    {
+      name: "Flood Risk (Elevation)",
+      score: data.elevation.score,
+      severity: data.elevation.severity,
+      lossPercent: `${(data.elevation.score * 0.3).toFixed(1)}%`,
+      operationalImpact:
+        "Low-elevation properties face direct inundation during storm surges and heavy rainfall events. Repeated flooding degrades foundations, electrical systems, and causes mold contamination that reduces asset habitability.",
+      recommendedAction:
+        "Install flood barriers and sump pump systems. Elevate critical electrical and HVAC infrastructure above projected flood lines. Consider flood-resilient landscaping and permeable surfaces.",
+    },
+    {
+      name: "Coastal Proximity",
+      score: data.coastal.score,
+      severity: data.coastal.severity,
+      lossPercent: `${(data.coastal.score * 0.25).toFixed(1)}%`,
+      operationalImpact:
+        "Close proximity to coastlines exposes properties to accelerated erosion, saltwater intrusion, and storm surge damage. Rising sea levels will compound these risks significantly over the next decades.",
+      recommendedAction:
+        "Invest in seawall reinforcement and coastal buffer zones. Ensure structural materials are salt-corrosion resistant. Evaluate long-term retreat or managed realignment strategies.",
+    },
+    {
+      name: "Seismic Activity",
+      score: data.earthquake.score,
+      severity: data.earthquake.severity,
+      lossPercent: `${(data.earthquake.score * 0.2).toFixed(1)}%`,
+      operationalImpact:
+        "Seismic events can cause catastrophic structural failure, foundation cracking, and utility disruption. Secondary effects include fires from gas line ruptures and prolonged business interruption.",
+      recommendedAction:
+        "Conduct seismic retrofitting assessments. Install base isolation systems and flexible utility connections. Maintain earthquake insurance coverage with adequate limits.",
+    },
+    {
+      name: "Extreme Heat Stress",
+      score: data.climate.score,
+      severity: data.climate.severity,
+      lossPercent: `${(data.climate.score * 0.15).toFixed(1)}%`,
+      operationalImpact:
+        "Prolonged heatwaves dramatically increase cooling costs, stress HVAC systems to failure, and reduce outdoor habitability. Worker productivity drops and heat-related health risks escalate.",
+      recommendedAction:
+        "Upgrade to high-albedo reflective roofing and advanced insulation. Install smart HVAC sensors with predictive maintenance. Add shading structures and green roof systems to reduce heat island effects.",
+    },
+    {
+      name: "River Flooding",
+      score: data.river.score,
+      severity: data.river.severity,
+      lossPercent: `${(data.river.score * 0.1).toFixed(1)}%`,
+      operationalImpact:
+        "Proximity to rivers increases exposure to flash flooding and seasonal overflow events. Sediment deposits, water contamination, and access road disruption can extend recovery timelines significantly.",
+      recommendedAction:
+        "Establish riparian buffer zones and install early-warning flood monitoring systems. Ensure adequate drainage infrastructure and waterproof below-grade spaces.",
+    },
+  ];
+
+  return risks.sort((a, b) => b.score - a.score).slice(0, 2);
+}
+
+function addPageHeader(pdf: jsPDF, title: string, date: string, margin: number) {
+  const pageWidth = pdf.internal.pageSize.getWidth();
+
+  pdf.setFillColor(10, 15, 30);
+  pdf.rect(0, 0, pageWidth, pdf.internal.pageSize.getHeight(), "F");
+
+  // Logo
+  pdf.setTextColor(0, 212, 255);
+  pdf.setFontSize(20);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("C", margin, 14);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(16);
+  pdf.text("ClimateVault", margin + 8, 14);
+
+  // Date
+  pdf.setFontSize(9);
+  pdf.setTextColor(160, 170, 190);
+  pdf.text(date, pageWidth - margin, 14, { align: "right" });
+
+  // Divider
+  pdf.setDrawColor(0, 212, 255);
+  pdf.setLineWidth(0.5);
+  pdf.line(margin, 19, pageWidth - margin, 19);
+
+  // Title
+  pdf.setFontSize(14);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFont("helvetica", "bold");
+  pdf.text(title, margin, 28);
+}
+
+function addPageFooter(pdf: jsPDF, pageNum: number, totalPages: number) {
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  pdf.setFontSize(8);
+  pdf.setTextColor(120, 130, 150);
+  pdf.text(
+    `Page ${pageNum} of ${totalPages} | Generated by ClimateVault Intelligence`,
+    pageWidth / 2,
+    pageHeight - 6,
+    { align: "center" }
+  );
+}
 
 interface ExportButtonProps {
   propertyName?: string;
+  analysisData?: AnalysisResult | null;
 }
 
-const ExportButton = ({ propertyName }: ExportButtonProps) => {
+const ExportButton = ({ propertyName, analysisData }: ExportButtonProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleExport = async () => {
@@ -20,7 +133,7 @@ const ExportButton = ({ propertyName }: ExportButtonProps) => {
     }
 
     setIsGenerating(true);
-    toast("Generating high-resolution report...");
+    toast("Compiling environmental data...");
 
     try {
       const canvas = await html2canvas(resultsEl, {
@@ -44,35 +157,12 @@ const ExportButton = ({ propertyName }: ExportButtonProps) => {
       });
       const name = propertyName?.trim() || "Property";
       const safeName = name.replace(/[^a-zA-Z0-9_ -]/g, "_");
+      const hasPage2 = !!analysisData;
 
-      // Header
-      pdf.setFillColor(10, 15, 30);
-      pdf.rect(0, 0, pageWidth, pageHeight, "F");
+      // ── PAGE 1: Visual Dashboard ──
+      addPageHeader(pdf, "ClimateVault Executive Risk Report", date, margin);
 
-      // Logo text
-      pdf.setTextColor(0, 212, 255);
-      pdf.setFontSize(20);
-      pdf.setFont("helvetica", "bold");
-      pdf.text("C", margin, 14);
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(16);
-      pdf.text("ClimateVault", margin + 8, 14);
-
-      // Date
-      pdf.setFontSize(9);
-      pdf.setTextColor(160, 170, 190);
-      pdf.text(date, pageWidth - margin, 14, { align: "right" });
-
-      // Divider
-      pdf.setDrawColor(0, 212, 255);
-      pdf.setLineWidth(0.5);
-      pdf.line(margin, 19, pageWidth - margin, 19);
-
-      // Title
-      pdf.setFontSize(14);
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFont("helvetica", "bold");
-      pdf.text(`Climate Risk & TCFD Disclosure Report`, margin, 28);
+      // Property name subtitle
       pdf.setFontSize(11);
       pdf.setTextColor(0, 212, 255);
       pdf.text(name, margin, 35);
@@ -93,21 +183,111 @@ const ExportButton = ({ propertyName }: ExportButtonProps) => {
       const xOffset = margin + (contentWidth - imgW) / 2;
       pdf.addImage(imgData, "PNG", xOffset, headerHeight, imgW, imgH);
 
-      // Footer
-      pdf.setFontSize(8);
-      pdf.setTextColor(120, 130, 150);
-      pdf.text(
-        "Page 1 of 1 | Generated by ClimateVault Intelligence",
-        pageWidth / 2,
-        pageHeight - 6,
-        { align: "center" }
-      );
+      addPageFooter(pdf, 1, hasPage2 ? 2 : 1);
+
+      // ── PAGE 2: Impact Analysis & Adaptation ──
+      if (analysisData) {
+        pdf.addPage();
+        addPageHeader(pdf, "Detailed Risk Impact & Adaptation Strategy", date, margin);
+
+        // Property subtitle
+        pdf.setFontSize(11);
+        pdf.setTextColor(0, 212, 255);
+        pdf.text(name, margin, 35);
+
+        // Overall risk summary
+        let yPos = 44;
+        pdf.setFontSize(10);
+        pdf.setTextColor(200, 210, 220);
+        pdf.text(`Overall Risk Score: ${analysisData.overallScore}/100 (${analysisData.riskLevel})`, margin, yPos);
+        yPos += 5;
+        pdf.text(`Projected Loss per Decade: ${(analysisData.lossPerDecade * 100).toFixed(0)}%`, margin, yPos);
+        yPos += 10;
+
+        // Divider
+        pdf.setDrawColor(40, 55, 80);
+        pdf.setLineWidth(0.3);
+        pdf.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 8;
+
+        const topRisks = buildRiskInsights(analysisData);
+
+        for (let i = 0; i < topRisks.length; i++) {
+          const risk = topRisks[i];
+
+          // Risk badge
+          pdf.setFontSize(13);
+          pdf.setFont("helvetica", "bold");
+          pdf.setTextColor(0, 212, 255);
+          pdf.text(`${i + 1}. ${risk.name}`, margin, yPos);
+          yPos += 6;
+
+          // Severity & score
+          pdf.setFontSize(9);
+          pdf.setFont("helvetica", "normal");
+          pdf.setTextColor(180, 190, 200);
+          pdf.text(`Severity: ${risk.severity}  |  Risk Score: ${risk.score}/100  |  Weighted Impact: ${risk.lossPercent}`, margin + 2, yPos);
+          yPos += 8;
+
+          // Projected Financial Impact
+          pdf.setFontSize(10);
+          pdf.setFont("helvetica", "bold");
+          pdf.setTextColor(255, 255, 255);
+          pdf.text("Projected Financial Impact", margin + 2, yPos);
+          yPos += 5;
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(9);
+          pdf.setTextColor(200, 210, 220);
+          const impactLines = pdf.splitTextToSize(
+            `This risk factor contributes a weighted ${risk.lossPercent} toward the total projected decade loss of ${(analysisData.lossPerDecade * 100).toFixed(0)}%.`,
+            contentWidth - 4
+          );
+          pdf.text(impactLines, margin + 2, yPos);
+          yPos += impactLines.length * 4.5 + 4;
+
+          // Operational Impact
+          pdf.setFontSize(10);
+          pdf.setFont("helvetica", "bold");
+          pdf.setTextColor(255, 255, 255);
+          pdf.text("Operational Impact", margin + 2, yPos);
+          yPos += 5;
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(9);
+          pdf.setTextColor(200, 210, 220);
+          const opLines = pdf.splitTextToSize(risk.operationalImpact, contentWidth - 4);
+          pdf.text(opLines, margin + 2, yPos);
+          yPos += opLines.length * 4.5 + 4;
+
+          // Recommended Action
+          pdf.setFontSize(10);
+          pdf.setFont("helvetica", "bold");
+          pdf.setTextColor(0, 212, 255);
+          pdf.text("✦ Recommended Action", margin + 2, yPos);
+          yPos += 5;
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(9);
+          pdf.setTextColor(200, 210, 220);
+          const actionLines = pdf.splitTextToSize(risk.recommendedAction, contentWidth - 4);
+          pdf.text(actionLines, margin + 2, yPos);
+          yPos += actionLines.length * 4.5 + 6;
+
+          // Separator between risks
+          if (i < topRisks.length - 1) {
+            pdf.setDrawColor(40, 55, 80);
+            pdf.setLineWidth(0.3);
+            pdf.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 8;
+          }
+        }
+
+        addPageFooter(pdf, 2, 2);
+      }
 
       pdf.save(`ClimateVault_Report_${safeName}.pdf`);
-      toast.success("Report downloaded successfully.");
+      toast.success("PDF Report generated successfully.");
     } catch (err) {
       console.error("PDF generation failed:", err);
-      toast.warning("PDF generation failed. Please try again or print the page.");
+      toast.error("Failed to generate PDF. Please try again.");
     } finally {
       setIsGenerating(false);
     }
