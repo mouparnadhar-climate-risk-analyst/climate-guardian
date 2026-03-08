@@ -106,9 +106,7 @@ const Index = () => {
           )}
           {analysisData && <DataSourcesPanel data={analysisData} />}
         </div>
-        {analysisData && (
-          <PrintReportPage2 data={analysisData} propertyName={formState.propertyName || "Unknown Property"} />
-        )}
+        <PrintableReport data={analysisData} propertyName={formState.propertyName || "Unknown Property"} assetValue={assetValue} />
         <ExportButton />
       </main>
       <Footer />

@@ -73,70 +73,33 @@
 @media print {
   @page { size: A4 portrait; margin: 1cm; }
 
-  /* 1. Kill all screen-height constraints and scroll locks on the root */
-  html, body, #root, main, .min-h-screen {
+  /* HIDE the entire app */
+  #root > *:not(.printable-report) {
+    display: none !important;
+  }
+
+  /* SHOW ONLY the printable report */
+  .printable-report {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    background-color: #0A0F1E !important;
+    color: white !important;
+    padding: 20px !important;
+  }
+
+  /* Reset body to avoid ghost pages */
+  html, body, #root {
     height: auto !important;
     min-height: auto !important;
     max-height: none !important;
-    width: 100% !important;
     overflow: visible !important;
-    position: static !important;
-    display: block !important;
-  }
-
-  /* Force dark background and white text */
-  body {
     background-color: #0A0F1E !important;
-    color: white !important;
     background-image: none !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
 
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-  }
-
-  /* Hide UI elements not needed in the report */
-  nav, footer, form, button, .input-panel-wrapper,
-  #asset-details-panel,
-  [data-mobile-sticky] {
-    display: none !important;
-  }
-
-  /* 2. Force grid and flex containers to stack blocks vertically */
-  .grid, .flex, .flex-row, .grid-cols-2 {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  /* 3. Give the Map and Chart hardcoded physical heights for paper */
-  .leaflet-container, .recharts-wrapper {
-    height: 300px !important;
-    min-height: 300px !important;
-    width: 100% !important;
-    display: block !important;
-    page-break-inside: avoid !important;
-    margin-bottom: 20px !important;
-  }
-
-  [data-testid="map-container"] {
-    height: 400px !important;
-    width: 100% !important;
-    display: block !important;
-    page-break-inside: avoid !important;
-  }
-
-  /* 4. Ensure KPI cards, tables, and risk cards fit the width */
-  table, .kpi-card, .risk-card, [class*="card"] {
-    width: 100% !important;
-    page-break-inside: avoid !important;
-  }
-
-  /* Full-width clean layout */
-  .container {
-    max-width: 100% !important;
-    padding: 0 !important;
   }
 }
