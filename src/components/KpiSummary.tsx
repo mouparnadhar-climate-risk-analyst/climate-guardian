@@ -54,20 +54,20 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div id="kpi-summary" className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
       {cards.map((card) => {
         const Icon = card.icon;
         return (
           <div
             key={card.title}
-            className="rounded-lg border border-border bg-card/60 backdrop-blur-md p-4"
+            className="rounded-lg border border-border bg-card/60 backdrop-blur-md p-3 md:p-4"
           >
-            <div className="flex items-center gap-2 mb-2">
-              <Icon className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground font-medium">{card.title}</span>
+            <div className="flex items-center gap-1.5 md:gap-2 mb-1.5 md:mb-2">
+              <Icon className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground" />
+              <span className="text-[10px] md:text-xs text-muted-foreground font-medium">{card.title}</span>
             </div>
-            <p className={`text-2xl font-bold ${card.valueClass}`}>{card.value}</p>
-            <p className="text-xs text-muted-foreground/60 mt-1">{card.subtitle}</p>
+            <p className={`text-lg md:text-2xl font-bold ${card.valueClass}`}>{card.value}</p>
+            <p className="text-[10px] md:text-xs text-muted-foreground/60 mt-1">{card.subtitle}</p>
           </div>
         );
       })}
