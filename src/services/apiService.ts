@@ -4,13 +4,17 @@ export interface GeoLocation {
   lat: number;
   lng: number;
   displayName: string;
+  status: DataStatus;
 }
+
+export type DataStatus = "LIVE" | "ESTIMATED";
 
 export interface ElevationResult {
   elevation: number;
   severity: string;
   score: number;
   source: string;
+  status: DataStatus;
 }
 
 export interface EarthquakeResult {
@@ -18,6 +22,7 @@ export interface EarthquakeResult {
   severity: string;
   score: number;
   source: string;
+  status: DataStatus;
 }
 
 export interface ClimateResult {
@@ -28,6 +33,7 @@ export interface ClimateResult {
   severity: string;
   score: number;
   source: string;
+  status: DataStatus;
 }
 
 export interface ProximityResult {
@@ -35,6 +41,7 @@ export interface ProximityResult {
   severity: string;
   score: number;
   source: string;
+  status: DataStatus;
 }
 
 export interface AnalysisResult {
@@ -101,12 +108,13 @@ export async function geocode(address: string): Promise<GeoLocation> {
         lat: parseFloat(data[0].lat),
         lng: parseFloat(data[0].lon),
         displayName: data[0].display_name,
+        status: "LIVE",
       };
     }
   } catch {
     // silent
   }
-  return { lat: 25.2048, lng: 55.2708, displayName: "Dubai, UAE (fallback)" };
+  return { lat: 25.2048, lng: 55.2708, displayName: "Dubai, UAE (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 2 — Elevation
@@ -119,12 +127,12 @@ export async function fetchElevation(lat: number, lon: number): Promise<Elevatio
     const data = await res.json();
     const elev: number = data?.results?.[0]?.elevation ?? 3.2;
     const sev = elevationSeverity(elev);
-    return { elevation: elev, severity: sev, score: severityToScore[sev], source: "Open Elevation API" };
+    return { elevation: elev, severity: sev, score: severityToScore[sev], source: "Open Elevation API", status: "LIVE" };
   } catch {
     // silent fallback
   }
   const sev = elevationSeverity(3.2);
-  return { elevation: 3.2, severity: sev, score: severityToScore[sev], source: "Open Elevation API (fallback)" };
+  return { elevation: 3.2, severity: sev, score: severityToScore[sev], source: "Open Elevation API (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 3 — Earthquake risk
@@ -137,12 +145,12 @@ export async function fetchEarthquakes(lat: number, lon: number): Promise<Earthq
     const data = await res.json();
     const count = data?.features?.length ?? 12;
     const sev = earthquakeSeverity(count);
-    return { count, severity: sev, score: severityToScore[sev], source: "USGS Earthquake Catalog" };
+    return { count, severity: sev, score: severityToScore[sev], source: "USGS Earthquake Catalog", status: "LIVE" };
   } catch {
     // silent fallback
   }
   const sev = earthquakeSeverity(12);
-  return { count: 12, severity: sev, score: severityToScore[sev], source: "USGS Earthquake Catalog (fallback)" };
+  return { count: 12, severity: sev, score: severityToScore[sev], source: "USGS Earthquake Catalog (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 4 — Climate data
@@ -153,8 +161,8 @@ export async function fetchClimate(lat: number, lon: number): Promise<ClimateRes
       { signal: AbortSignal.timeout(8000) }
     );
     const data = await res.json();
-    const temps: number[] = data?.daily?.temperature_2m_max ?? [];
-    const precip: number[] = data?.daily?.precipitation_sum ?? [];
+    const temps: number[] = (data?.daily?.temperature_2m_max ?? []).filter((t: number | null) => t !== null);
+    const precip: number[] = (data?.daily?.precipitation_sum ?? []).filter((p: number | null) => p !== null);
 
     const avgMaxTemp = temps.length > 0 ? temps.reduce((a: number, b: number) => a + b, 0) / temps.length : 38;
     const totalPrecipitation = precip.reduce((a: number, b: number) => a + b, 0);
@@ -166,11 +174,11 @@ export async function fetchClimate(lat: number, lon: number): Promise<ClimateRes
     const score = Math.round((heatScore + rainScore) / 2);
     const severity = score >= 80 ? "EXTREME" : score >= 60 ? "HIGH" : score >= 40 ? "MEDIUM" : "LOW";
 
-    return { avgMaxTemp: Math.round(avgMaxTemp * 10) / 10, totalPrecipitation: Math.round(totalPrecipitation), heatStressDays, extremeRainfallDays, severity, score, source: "Open-Meteo Climate API" };
+    return { avgMaxTemp: Math.round(avgMaxTemp * 10) / 10, totalPrecipitation: Math.round(totalPrecipitation), heatStressDays, extremeRainfallDays, severity, score, source: "Open-Meteo Climate API", status: "LIVE" };
   } catch {
     // silent fallback
   }
-  return { avgMaxTemp: 38, totalPrecipitation: 120, heatStressDays: 14, extremeRainfallDays: 2, severity: "HIGH", score: 75, source: "Open-Meteo Climate API (fallback)" };
+  return { avgMaxTemp: 38, totalPrecipitation: 120, heatStressDays: 14, extremeRainfallDays: 2, severity: "HIGH", score: 75, source: "Open-Meteo Climate API (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 5 — Coastal proximity
@@ -182,7 +190,6 @@ export async function fetchCoastalProximity(lat: number, lon: number): Promise<P
     );
     const data = await res.json();
     if (data?.elements?.length > 0) {
-      // Estimate distance from first element's geometry
       let minDist = Infinity;
       for (const el of data.elements) {
         if (el.geometry) {
@@ -194,16 +201,15 @@ export async function fetchCoastalProximity(lat: number, lon: number): Promise<P
       }
       const km = minDist === Infinity ? 1.2 : Math.round(minDist * 10) / 10;
       const sev = coastalSeverity(km);
-      return { distanceKm: km, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)" };
+      return { distanceKm: km, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)", status: "LIVE" };
     }
-    // No coastline found within 10km
     const sev = coastalSeverity(15);
-    return { distanceKm: 15, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)" };
+    return { distanceKm: 15, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)", status: "LIVE" };
   } catch {
     // silent fallback
   }
   const sev = coastalSeverity(1.2);
-  return { distanceKm: 1.2, severity: sev, score: severityToScore[sev], source: "Overpass API (fallback)" };
+  return { distanceKm: 1.2, severity: sev, score: severityToScore[sev], source: "Overpass API (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 6 — River proximity
@@ -226,15 +232,15 @@ export async function fetchRiverProximity(lat: number, lon: number): Promise<Pro
       }
       const km = minDist === Infinity ? 4 : Math.round(minDist * 10) / 10;
       const sev = riverSeverity(km);
-      return { distanceKm: km, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)" };
+      return { distanceKm: km, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)", status: "LIVE" };
     }
     const sev = riverSeverity(15);
-    return { distanceKm: 15, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)" };
+    return { distanceKm: 15, severity: sev, score: severityToScore[sev], source: "Overpass API (OpenStreetMap)", status: "LIVE" };
   } catch {
     // silent fallback
   }
   const sev = riverSeverity(4);
-  return { distanceKm: 4, severity: sev, score: severityToScore[sev], source: "Overpass API (fallback)" };
+  return { distanceKm: 4, severity: sev, score: severityToScore[sev], source: "Overpass API (fallback)", status: "ESTIMATED" };
 }
 
 function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Mountain, Waves, Activity, ThermometerSun, Droplets, AlertTriangle } from "lucide-react";
-import type { AnalysisResult } from "@/services/apiService";
+import type { AnalysisResult, DataStatus } from "@/services/apiService";
 
 const SEVERITY_COLORS: Record<string, string> = {
   MINIMAL: "bg-green-500",
@@ -22,6 +22,21 @@ interface RiskFactorsProps {
   data: AnalysisResult;
 }
 
+const StatusBadge = ({ status }: { status: DataStatus }) => {
+  if (status === "LIVE") {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-900/20 text-emerald-400">
+        🟢 LIVE DATA
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-yellow-900/20 text-yellow-400">
+      🟡 ESTIMATED
+    </span>
+  );
+};
+
 const RiskFactors = ({ data }: RiskFactorsProps) => {
   const factors = [
     {
@@ -32,6 +47,7 @@ const RiskFactors = ({ data }: RiskFactorsProps) => {
       detail: `Elevation: ${data.elevation.elevation}m above sea level`,
       explanation: "Low-lying assets face significantly higher flood and storm surge exposure.",
       source: data.elevation.source,
+      status: data.elevation.status,
     },
     {
       icon: Waves,
@@ -41,6 +57,7 @@ const RiskFactors = ({ data }: RiskFactorsProps) => {
       detail: `Distance to coast: ${data.coastal.distanceKm}km`,
       explanation: "Proximity to coastline increases exposure to storm surges, saltwater intrusion, and sea-level rise.",
       source: data.coastal.source,
+      status: data.coastal.status,
     },
     {
       icon: Activity,
@@ -50,6 +67,7 @@ const RiskFactors = ({ data }: RiskFactorsProps) => {
       detail: `${data.earthquake.count} significant earthquakes (M4.0+) since 2000`,
       explanation: "Seismic history indicates structural risk from tectonic activity in the region.",
       source: data.earthquake.source,
+      status: data.earthquake.status,
     },
     {
       icon: ThermometerSun,
@@ -59,6 +77,7 @@ const RiskFactors = ({ data }: RiskFactorsProps) => {
       detail: `${data.climate.heatStressDays} days >35°C in last 90 days (avg max: ${data.climate.avgMaxTemp}°C)`,
       explanation: "Extreme heat degrades infrastructure, increases cooling costs, and reduces asset lifespan.",
       source: data.climate.source,
+      status: data.climate.status,
     },
     {
       icon: Droplets,
@@ -68,6 +87,7 @@ const RiskFactors = ({ data }: RiskFactorsProps) => {
       detail: `Distance to nearest river: ${data.river.distanceKm}km`,
       explanation: "Proximity to rivers increases risk of fluvial flooding events during heavy rainfall.",
       source: data.river.source,
+      status: data.river.status,
     },
   ];
 
@@ -102,11 +122,14 @@ const RiskFactors = ({ data }: RiskFactorsProps) => {
                   <Icon className={`h-6 w-6 ${f.iconColor}`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <h3 className="font-semibold text-foreground text-base">{f.name}</h3>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${SEVERITY_COLORS[f.severity]} text-white`}>
-                      {f.severity}
-                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <StatusBadge status={f.status} />
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${SEVERITY_COLORS[f.severity]} text-white`}>
+                        {f.severity}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Severity bar */}

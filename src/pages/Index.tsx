@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import KpiSummary from "@/components/KpiSummary";
@@ -9,6 +9,7 @@ import RiskFactors from "@/components/RiskFactors";
 import DataSourcesPanel from "@/components/DataSourcesPanel";
 import ExportButton from "@/components/ExportButton";
 import AnalysisLoadingModal from "@/components/AnalysisLoadingModal";
+import EstimatedWarningCard from "@/components/EstimatedWarningCard";
 import { runFullAnalysis, type AnalysisResult } from "@/services/apiService";
 
 const Index = () => {
@@ -17,8 +18,10 @@ const Index = () => {
   const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
   const [loadingStep, setLoadingStep] = useState(-1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const lastAddress = useRef("");
 
   const handleAnalyze = async (address: string) => {
+    lastAddress.current = address;
     setIsAnalyzing(true);
     setLoadingStep(-1);
 
@@ -31,12 +34,21 @@ const Index = () => {
     setIsAnalyzing(false);
   };
 
+  const handleRetry = () => {
+    if (lastAddress.current) {
+      handleAnalyze(lastAddress.current);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
       <main className="container pb-12">
         <KpiSummary assetValue={assetValue} analysisData={analysisData} />
+        {analysisData && (
+          <EstimatedWarningCard data={analysisData} onRetry={handleRetry} />
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-2">
             <AssetDetailsPanel
