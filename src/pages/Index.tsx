@@ -73,7 +73,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+    <div className="min-h-screen bg-transparent pb-16 md:pb-0">
       <Navbar onDemo={handleDemo} />
       <HeroSection />
       <main className="container pb-12 px-4 md:px-6">
