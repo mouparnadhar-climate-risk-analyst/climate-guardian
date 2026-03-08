@@ -161,8 +161,8 @@ export async function fetchClimate(lat: number, lon: number): Promise<ClimateRes
       { signal: AbortSignal.timeout(8000) }
     );
     const data = await res.json();
-    const temps: number[] = data?.daily?.temperature_2m_max ?? [];
-    const precip: number[] = data?.daily?.precipitation_sum ?? [];
+    const temps: number[] = (data?.daily?.temperature_2m_max ?? []).filter((t: number | null) => t !== null);
+    const precip: number[] = (data?.daily?.precipitation_sum ?? []).filter((p: number | null) => p !== null);
 
     const avgMaxTemp = temps.length > 0 ? temps.reduce((a: number, b: number) => a + b, 0) / temps.length : 38;
     const totalPrecipitation = precip.reduce((a: number, b: number) => a + b, 0);
@@ -174,11 +174,11 @@ export async function fetchClimate(lat: number, lon: number): Promise<ClimateRes
     const score = Math.round((heatScore + rainScore) / 2);
     const severity = score >= 80 ? "EXTREME" : score >= 60 ? "HIGH" : score >= 40 ? "MEDIUM" : "LOW";
 
-    return { avgMaxTemp: Math.round(avgMaxTemp * 10) / 10, totalPrecipitation: Math.round(totalPrecipitation), heatStressDays, extremeRainfallDays, severity, score, source: "Open-Meteo Climate API" };
+    return { avgMaxTemp: Math.round(avgMaxTemp * 10) / 10, totalPrecipitation: Math.round(totalPrecipitation), heatStressDays, extremeRainfallDays, severity, score, source: "Open-Meteo Climate API", status: "LIVE" };
   } catch {
     // silent fallback
   }
-  return { avgMaxTemp: 38, totalPrecipitation: 120, heatStressDays: 14, extremeRainfallDays: 2, severity: "HIGH", score: 75, source: "Open-Meteo Climate API (fallback)" };
+  return { avgMaxTemp: 38, totalPrecipitation: 120, heatStressDays: 14, extremeRainfallDays: 2, severity: "HIGH", score: 75, source: "Open-Meteo Climate API (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 5 — Coastal proximity
