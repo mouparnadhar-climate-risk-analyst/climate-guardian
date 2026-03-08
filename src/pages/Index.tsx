@@ -13,7 +13,7 @@ import EstimatedWarningCard from "@/components/EstimatedWarningCard";
 import MobileStickyBar from "@/components/MobileStickyBar";
 import Footer from "@/components/Footer";
 import DisasterScenarios from "@/components/DisasterScenarios";
-import PrintReportPage2 from "@/components/PrintReportPage2";
+import PrintableReport from "@/components/PrintableReport";
 import { runFullAnalysis, type AnalysisResult } from "@/services/apiService";
 
 const INITIAL_FORM: AssetFormState = {
@@ -106,9 +106,7 @@ const Index = () => {
           )}
           {analysisData && <DataSourcesPanel data={analysisData} />}
         </div>
-        {analysisData && (
-          <PrintReportPage2 data={analysisData} propertyName={formState.propertyName || "Unknown Property"} />
-        )}
+        <PrintableReport data={analysisData} propertyName={formState.propertyName || "Unknown Property"} assetValue={assetValue} />
         <ExportButton />
       </main>
       <Footer />
