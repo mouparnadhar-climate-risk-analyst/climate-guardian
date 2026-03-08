@@ -105,7 +105,7 @@ const Index = () => {
           )}
           {analysisData && <DataSourcesPanel data={analysisData} />}
         </div>
-        <ExportButton propertyName={formState.propertyName} analysisData={analysisData} />
+        <ExportButton />
       </main>
       <Footer />
       <MobileStickyBar onAnalyze={handleMobileAnalyze} isAnalyzing={isAnalyzing} />
