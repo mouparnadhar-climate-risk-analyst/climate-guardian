@@ -127,12 +127,12 @@ export async function fetchElevation(lat: number, lon: number): Promise<Elevatio
     const data = await res.json();
     const elev: number = data?.results?.[0]?.elevation ?? 3.2;
     const sev = elevationSeverity(elev);
-    return { elevation: elev, severity: sev, score: severityToScore[sev], source: "Open Elevation API" };
+    return { elevation: elev, severity: sev, score: severityToScore[sev], source: "Open Elevation API", status: "LIVE" };
   } catch {
     // silent fallback
   }
   const sev = elevationSeverity(3.2);
-  return { elevation: 3.2, severity: sev, score: severityToScore[sev], source: "Open Elevation API (fallback)" };
+  return { elevation: 3.2, severity: sev, score: severityToScore[sev], source: "Open Elevation API (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 3 — Earthquake risk
