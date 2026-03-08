@@ -28,6 +28,7 @@ const Index = () => {
           </div>
         </div>
         <FinancialRiskSection assetValue={assetValue} />
+        <DisasterScenarios assetValue={assetValue} />
       </main>
     </div>
   );
