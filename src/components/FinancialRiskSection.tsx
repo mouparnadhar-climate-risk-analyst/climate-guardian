@@ -55,10 +55,11 @@ const FinancialRiskSection = ({ assetValue, lossPerDecade }: FinancialRiskSectio
   }, [baseValue, rate]);
 
   const chartData = useMemo(() => {
-    return [0, 1, 2, 3, 4].map((i) => {
+    const accels = [1, 1, 1, 1, 1, 1.4, 1.4 * 1.35];
+    return [0, 1, 2, 3, 4, 5, 6].map((i) => {
       const year = 2025 + i * 10;
-      const bauLoss = 1 - Math.pow(1 - rate, i);
-      const adaptLoss = 1 - Math.pow(1 - adaptRate, i);
+      const bauLoss = (1 - Math.pow(1 - rate, i)) * accels[i];
+      const adaptLoss = (1 - Math.pow(1 - adaptRate, i)) * accels[i];
       return {
         year,
         bau: baseValue * (1 - Math.min(bauLoss, 0.99)),
