@@ -1,32 +1,40 @@
 import { useMemo } from "react";
 import { ShieldAlert, TrendingDown, ShieldCheck, FileText } from "lucide-react";
+import type { AnalysisResult } from "@/services/apiService";
 
 const fmt = (n: number) =>
   "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
 
 interface KpiSummaryProps {
   assetValue: string;
+  analysisData?: AnalysisResult | null;
 }
 
-const KpiSummary = ({ assetValue }: KpiSummaryProps) => {
+const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
   const baseValue = useMemo(() => {
     const parsed = parseFloat(assetValue.replace(/[^0-9.]/g, ""));
     return isNaN(parsed) || parsed <= 0 ? 10_000_000 : parsed;
   }, [assetValue]);
 
+  const riskScore = analysisData?.overallScore ?? 73;
+  const lossRate = analysisData?.lossPerDecade ?? 0.10;
+  const loss2065 = 1 - Math.pow(1 - lossRate, 4);
+
   const cards = [
     {
       title: "Overall Risk Score",
-      value: "73/100",
+      value: `${riskScore}/100`,
       valueClass: "text-primary",
-      subtitle: "HIGH RISK — Immediate action recommended",
+      subtitle: analysisData
+        ? `${analysisData.riskLevel} — ${riskScore > 60 ? "Immediate action recommended" : "Monitor periodically"}`
+        : "HIGH RISK — Immediate action recommended",
       icon: ShieldAlert,
     },
     {
       title: "Value Loss by 2065",
-      value: fmt(baseValue * 0.42),
+      value: fmt(baseValue * loss2065),
       valueClass: "text-destructive",
-      subtitle: "Under RCP 8.5 scenario",
+      subtitle: analysisData ? "Based on live geospatial analysis" : "Under RCP 8.5 scenario",
       icon: TrendingDown,
     },
     {
