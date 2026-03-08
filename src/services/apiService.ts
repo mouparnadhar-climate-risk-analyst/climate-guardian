@@ -142,8 +142,9 @@ export async function fetchEarthquakes(lat: number, lon: number): Promise<Earthq
       `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=${lat}&longitude=${lon}&maxradius=2&minmagnitude=4.0&limit=50&starttime=2000-01-01&endtime=2024-12-31`,
       { signal: AbortSignal.timeout(8000) }
     );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const count = data?.features?.length ?? 12;
+    const count = Array.isArray(data?.features) ? data.features.length : 0;
     const sev = earthquakeSeverity(count);
     return { count, severity: sev, score: severityToScore[sev], source: "USGS Earthquake Catalog", status: "LIVE" };
   } catch {
