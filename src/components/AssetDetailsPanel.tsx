@@ -39,11 +39,18 @@ const countries = [
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 125 }, (_, i) => String(currentYear - i));
 
+export interface ResilienceChecks {
+  floodBarriers: boolean;
+  seismicRetrofit: boolean;
+  heatReflective: boolean;
+}
+
 export interface AssetFormState {
   propertyName: string;
   propertyType: string;
   constructionYear: string;
   country: string;
+  resilience: ResilienceChecks;
 }
 
 interface AssetDetailsPanelProps {
