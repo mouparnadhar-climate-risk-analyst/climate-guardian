@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Wand2 } from "lucide-react";
+import { Wand2, Download } from "lucide-react";
+import { usePwaInstall } from "@/hooks/usePwaInstall";
 
 const VaultLogo = () => (
   <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -13,6 +14,8 @@ interface NavbarProps {
 }
 
 const Navbar = ({ onDemo }: NavbarProps) => {
+  const { canInstall, install } = usePwaInstall();
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="container flex h-14 md:h-16 items-center justify-between">
@@ -21,6 +24,17 @@ const Navbar = ({ onDemo }: NavbarProps) => {
           <span className="text-base md:text-lg font-bold tracking-wider text-foreground">CLIMATEVAULT</span>
         </div>
         <div className="flex items-center gap-2">
+          {canInstall && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-all text-xs md:text-sm"
+              onClick={install}
+            >
+              <Download className="h-3.5 w-3.5 mr-1.5" />
+              Install App
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
