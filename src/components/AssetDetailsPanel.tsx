@@ -18,41 +18,20 @@ const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 125 }, (_, i) => String(currentYear - i));
 
 interface AssetDetailsPanelProps {
-  onAnalyze?: (location: { lat: number; lng: number }) => void;
+  onAnalyze?: (address: string) => void;
   assetValue: string;
   onAssetValueChange: (value: string) => void;
 }
 
 const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange }: AssetDetailsPanelProps) => {
   const [propertyName, setPropertyName] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = () => {
     if (!propertyName.trim()) {
       toast.error("Please enter a property name or address.");
       return;
     }
-
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(propertyName)}&limit=1`
-      );
-      const data = await res.json();
-
-      if (data.length === 0) {
-        toast.error("Location not found. Try a more specific address.");
-        return;
-      }
-
-      const { lat, lon } = data[0];
-      onAnalyze?.({ lat: parseFloat(lat), lng: parseFloat(lon) });
-      toast.success(`Analysis running for: ${data[0].display_name.split(",")[0]}`);
-    } catch {
-      toast.error("Geocoding failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    onAnalyze?.(propertyName);
   };
 
   return (
@@ -132,11 +111,9 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange }: AssetD
 
         <Button
           onClick={handleAnalyze}
-          disabled={loading}
           className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 glow-primary font-semibold text-base h-12 transition-all hover:glow-primary-intense"
         >
-          {loading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
-          {loading ? "Analyzing..." : "Run Climate Risk Analysis"}
+          Run Climate Risk Analysis
         </Button>
       </div>
     </motion.div>

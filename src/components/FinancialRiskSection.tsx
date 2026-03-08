@@ -3,67 +3,67 @@ import { motion } from "framer-motion";
 import { TrendingDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  Legend,
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
 } from "recharts";
-
-const RISK_ROWS = [
-  { year: 2025, scenario: "Baseline", pct: 1.0, risk: "LOW", color: "bg-green-500" },
-  { year: 2035, scenario: "RCP 4.5", pct: 0.94, risk: "LOW-MEDIUM", color: "bg-yellow-500" },
-  { year: 2045, scenario: "RCP 4.5", pct: 0.86, risk: "MEDIUM", color: "bg-orange-500" },
-  { year: 2055, scenario: "RCP 8.5", pct: 0.73, risk: "HIGH", color: "bg-red-500" },
-  { year: 2065, scenario: "RCP 8.5", pct: 0.58, risk: "VERY HIGH", color: "bg-red-800" },
-];
-
-const ADAPTATION_FACTOR = [1.0, 0.97, 0.93, 0.87, 0.80];
 
 const fmt = (n: number) =>
   "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
 
-interface FinancialRiskSectionProps {
-  assetValue: string;
+function riskLabel(pct: number): { risk: string; color: string } {
+  if (pct <= 0.05) return { risk: "LOW", color: "bg-green-500" };
+  if (pct <= 0.15) return { risk: "LOW-MEDIUM", color: "bg-yellow-500" };
+  if (pct <= 0.30) return { risk: "MEDIUM", color: "bg-orange-500" };
+  if (pct <= 0.50) return { risk: "HIGH", color: "bg-red-500" };
+  return { risk: "VERY HIGH", color: "bg-red-800" };
 }
 
-const FinancialRiskSection = ({ assetValue }: FinancialRiskSectionProps) => {
+interface FinancialRiskSectionProps {
+  assetValue: string;
+  lossPerDecade?: number; // from API, e.g. 0.16
+}
+
+const FinancialRiskSection = ({ assetValue, lossPerDecade }: FinancialRiskSectionProps) => {
   const baseValue = useMemo(() => {
     const parsed = parseFloat(assetValue.replace(/[^0-9.]/g, ""));
     return isNaN(parsed) || parsed <= 0 ? 10_000_000 : parsed;
   }, [assetValue]);
 
-  const rows = useMemo(
-    () =>
-      RISK_ROWS.map((r) => ({
-        ...r,
-        projected: baseValue * r.pct,
-        loss: baseValue * (1 - r.pct),
-        lossPct: ((1 - r.pct) * 100).toFixed(0),
-      })),
-    [baseValue]
-  );
+  const rate = lossPerDecade ?? 0.10; // default ~10% if no analysis run
+  const adaptRate = rate * 0.35; // adaptation reduces loss by 65%
 
-  const chartData = useMemo(
-    () =>
-      RISK_ROWS.map((r, i) => ({
-        year: r.year,
-        bau: baseValue * r.pct,
-        adapted: baseValue * ADAPTATION_FACTOR[i],
-      })),
-    [baseValue]
-  );
+  const rows = useMemo(() => {
+    const decades = [
+      { year: 2025, scenario: "Baseline", decadesOut: 0 },
+      { year: 2035, scenario: "RCP 4.5", decadesOut: 1 },
+      { year: 2045, scenario: "RCP 4.5", decadesOut: 2 },
+      { year: 2055, scenario: "RCP 8.5", decadesOut: 3 },
+      { year: 2065, scenario: "RCP 8.5", decadesOut: 4 },
+    ];
+    return decades.map((d) => {
+      const cumulativeLoss = 1 - Math.pow(1 - rate, d.decadesOut);
+      const pct = Math.min(cumulativeLoss, 0.99);
+      const projected = baseValue * (1 - pct);
+      const loss = baseValue * pct;
+      const { risk, color } = riskLabel(pct);
+      return { ...d, pct, projected, loss, lossPctStr: (pct * 100).toFixed(0), risk, color };
+    });
+  }, [baseValue, rate]);
+
+  const chartData = useMemo(() => {
+    return [0, 1, 2, 3, 4].map((i) => {
+      const year = 2025 + i * 10;
+      const bauLoss = 1 - Math.pow(1 - rate, i);
+      const adaptLoss = 1 - Math.pow(1 - adaptRate, i);
+      return {
+        year,
+        bau: baseValue * (1 - Math.min(bauLoss, 0.99)),
+        adapted: baseValue * (1 - Math.min(adaptLoss, 0.99)),
+      };
+    });
+  }, [baseValue, rate, adaptRate]);
 
   return (
     <motion.section
@@ -79,6 +79,11 @@ const FinancialRiskSection = ({ assetValue }: FinancialRiskSectionProps) => {
           Financial Risk Projection{" "}
           <span className="text-muted-foreground font-normal text-base">(10-Year Intervals)</span>
         </h2>
+        {lossPerDecade != null && (
+          <span className="ml-auto text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
+            Loss rate: {(rate * 100).toFixed(0)}%/decade (data-driven)
+          </span>
+        )}
       </div>
 
       {/* Table */}
@@ -104,7 +109,7 @@ const FinancialRiskSection = ({ assetValue }: FinancialRiskSectionProps) => {
                   {r.loss === 0 ? "—" : `-${fmt(r.loss)}`}
                 </TableCell>
                 <TableCell className="text-right text-foreground">
-                  {r.loss === 0 ? "0%" : `-${r.lossPct}%`}
+                  {r.loss === 0 ? "0%" : `-${r.lossPctStr}%`}
                 </TableCell>
                 <TableCell className="text-center">
                   <Badge variant="outline" className={`${r.color} text-white border-none text-xs`}>
@@ -148,29 +153,14 @@ const FinancialRiskSection = ({ assetValue }: FinancialRiskSectionProps) => {
               }
               wrapperStyle={{ color: "hsl(220 20% 60%)" }}
             />
-            <Line
-              type="monotone"
-              dataKey="bau"
-              stroke="hsl(0 84% 60%)"
-              strokeWidth={2}
-              dot={{ fill: "hsl(0 84% 60%)", r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="adapted"
-              stroke="hsl(142 76% 46%)"
-              strokeWidth={2}
-              dot={{ fill: "hsl(142 76% 46%)", r: 4 }}
-              activeDot={{ r: 6 }}
-            />
+            <Line type="monotone" dataKey="bau" stroke="hsl(0 84% 60%)" strokeWidth={2} dot={{ fill: "hsl(0 84% 60%)", r: 4 }} activeDot={{ r: 6 }} />
+            <Line type="monotone" dataKey="adapted" stroke="hsl(142 76% 46%)" strokeWidth={2} dot={{ fill: "hsl(142 76% 46%)", r: 4 }} activeDot={{ r: 6 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Footnote */}
       <p className="mt-4 text-xs text-muted-foreground/60 text-center">
-        Based on IPCC AR6 SSP2-4.5 and SSP5-8.5 projections. For illustrative purposes.
+        Based on IPCC AR6 SSP2-4.5 and SSP5-8.5 projections. {lossPerDecade != null ? "Loss rates computed from live geospatial data." : "For illustrative purposes."}
       </p>
     </motion.section>
   );
