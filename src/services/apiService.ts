@@ -32,6 +32,7 @@ export interface ClimateResult {
   severity: string;
   score: number;
   source: string;
+  status: DataStatus;
 }
 
 export interface ProximityResult {
