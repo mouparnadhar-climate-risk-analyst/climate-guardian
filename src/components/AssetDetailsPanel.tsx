@@ -10,8 +10,28 @@ import { toast } from "sonner";
 const propertyTypes = ["Commercial Office", "Residential", "Residential Villa", "Industrial", "Retail", "Mixed Use", "Data Center", "Warehouse"];
 
 const countries = [
-  "United States", "United Kingdom", "Germany", "France", "Japan", "Australia",
-  "Canada", "India", "Brazil", "China", "Netherlands", "Singapore", "UAE/Dubai",
+  "Albania", "Argentina", "Australia", "Austria",
+  "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belgium", "Brazil", "Bulgaria",
+  "Cambodia", "Canada", "Chile", "China", "Colombia", "Croatia", "Cyprus", "Czech Republic",
+  "Denmark", "Dominican Republic",
+  "Egypt", "Estonia",
+  "Fiji", "Finland", "France",
+  "Germany", "Greece",
+  "Hong Kong", "Hungary",
+  "Iceland", "India", "Indonesia", "Ireland", "Israel", "Italy",
+  "Jamaica", "Japan", "Jordan",
+  "Kenya", "Kuwait",
+  "Latvia", "Lebanon", "Lithuania", "Luxembourg",
+  "Malaysia", "Maldives", "Malta", "Mauritius", "Mexico", "Monaco", "Morocco",
+  "Nepal", "Netherlands", "New Zealand", "Nigeria", "Norway",
+  "Oman",
+  "Pakistan", "Philippines", "Poland", "Portugal",
+  "Qatar",
+  "Romania", "Russia",
+  "Saudi Arabia", "Seychelles", "Singapore", "Slovakia", "Slovenia", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sweden", "Switzerland",
+  "Taiwan", "Thailand", "Turkey",
+  "UAE", "UK", "Ukraine", "USA",
+  "Vanuatu", "Vietnam",
 ];
 
 const currentYear = new Date().getFullYear();
