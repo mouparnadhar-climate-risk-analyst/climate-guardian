@@ -19,11 +19,12 @@ const years = Array.from({ length: 125 }, (_, i) => String(currentYear - i));
 
 interface AssetDetailsPanelProps {
   onAnalyze?: (location: { lat: number; lng: number }) => void;
+  assetValue: string;
+  onAssetValueChange: (value: string) => void;
 }
 
-const AssetDetailsPanel = ({ onAnalyze }: AssetDetailsPanelProps) => {
+const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange }: AssetDetailsPanelProps) => {
   const [propertyName, setPropertyName] = useState("");
-  const [assetValue, setAssetValue] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleAnalyze = async () => {
@@ -82,7 +83,7 @@ const AssetDetailsPanel = ({ onAnalyze }: AssetDetailsPanelProps) => {
           <Input
             placeholder="e.g. 25,000,000"
             value={assetValue}
-            onChange={(e) => setAssetValue(e.target.value)}
+            onChange={(e) => onAssetValueChange(e.target.value)}
             className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
           />
         </div>
