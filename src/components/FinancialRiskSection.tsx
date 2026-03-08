@@ -17,7 +17,8 @@ function riskLabel(pct: number): { risk: string; color: string } {
   if (pct <= 0.15) return { risk: "LOW-MEDIUM", color: "bg-yellow-500" };
   if (pct <= 0.30) return { risk: "MEDIUM", color: "bg-orange-500" };
   if (pct <= 0.50) return { risk: "HIGH", color: "bg-red-500" };
-  return { risk: "VERY HIGH", color: "bg-red-800" };
+  if (pct <= 0.70) return { risk: "VERY HIGH", color: "bg-red-800" };
+  return { risk: "EXTREME", color: "bg-purple-950" };
 }
 
 interface FinancialRiskSectionProps {
@@ -36,15 +37,17 @@ const FinancialRiskSection = ({ assetValue, lossPerDecade }: FinancialRiskSectio
 
   const rows = useMemo(() => {
     const decades = [
-      { year: 2025, scenario: "Baseline", decadesOut: 0 },
-      { year: 2035, scenario: "RCP 4.5", decadesOut: 1 },
-      { year: 2045, scenario: "RCP 4.5", decadesOut: 2 },
-      { year: 2055, scenario: "RCP 8.5", decadesOut: 3 },
-      { year: 2065, scenario: "RCP 8.5", decadesOut: 4 },
+      { year: 2025, scenario: "Baseline", decadesOut: 0, accel: 1 },
+      { year: 2035, scenario: "RCP 4.5", decadesOut: 1, accel: 1 },
+      { year: 2045, scenario: "RCP 4.5", decadesOut: 2, accel: 1 },
+      { year: 2055, scenario: "RCP 8.5", decadesOut: 3, accel: 1 },
+      { year: 2065, scenario: "RCP 8.5", decadesOut: 4, accel: 1 },
+      { year: 2075, scenario: "RCP 8.5", decadesOut: 5, accel: 1.4 },
+      { year: 2085, scenario: "RCP 8.5", decadesOut: 6, accel: 1.4 * 1.35 },
     ];
     return decades.map((d) => {
-      const cumulativeLoss = 1 - Math.pow(1 - rate, d.decadesOut);
-      const pct = Math.min(cumulativeLoss, 0.99);
+      const baseLoss = 1 - Math.pow(1 - rate, d.decadesOut);
+      const pct = Math.min(baseLoss * d.accel, 0.99);
       const projected = baseValue * (1 - pct);
       const loss = baseValue * pct;
       const { risk, color } = riskLabel(pct);
@@ -53,10 +56,11 @@ const FinancialRiskSection = ({ assetValue, lossPerDecade }: FinancialRiskSectio
   }, [baseValue, rate]);
 
   const chartData = useMemo(() => {
-    return [0, 1, 2, 3, 4].map((i) => {
+    const accels = [1, 1, 1, 1, 1, 1.4, 1.4 * 1.35];
+    return [0, 1, 2, 3, 4, 5, 6].map((i) => {
       const year = 2025 + i * 10;
-      const bauLoss = 1 - Math.pow(1 - rate, i);
-      const adaptLoss = 1 - Math.pow(1 - adaptRate, i);
+      const bauLoss = (1 - Math.pow(1 - rate, i)) * accels[i];
+      const adaptLoss = (1 - Math.pow(1 - adaptRate, i)) * accels[i];
       return {
         year,
         bau: baseValue * (1 - Math.min(bauLoss, 0.99)),
