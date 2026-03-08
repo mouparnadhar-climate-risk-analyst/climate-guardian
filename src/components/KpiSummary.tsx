@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { ShieldAlert, TrendingDown, ShieldCheck, FileText } from "lucide-react";
 import type { AnalysisResult } from "@/services/apiService";
+import type { ResilienceChecks } from "@/components/AssetDetailsPanel";
 
 const fmt = (n: number) =>
   "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
@@ -8,6 +9,7 @@ const fmt = (n: number) =>
 interface KpiSummaryProps {
   assetValue: string;
   analysisData?: AnalysisResult | null;
+  resilience?: ResilienceChecks;
 }
 
 const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
