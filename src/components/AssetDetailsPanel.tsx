@@ -150,6 +150,40 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyz
           </Select>
         </div>
 
+        <Accordion type="single" collapsible className="border border-border rounded-lg">
+          <AccordionItem value="resilience" className="border-none">
+            <AccordionTrigger className="px-3 py-2.5 text-xs md:text-sm text-muted-foreground hover:no-underline">
+              Building Structural Details (Optional)
+            </AccordionTrigger>
+            <AccordionContent className="px-3 space-y-3">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <Checkbox
+                  checked={formState.resilience?.floodBarriers ?? false}
+                  onCheckedChange={(v) => update({ resilience: { ...formState.resilience, floodBarriers: !!v } })}
+                  className="mt-0.5"
+                />
+                <span className="text-xs text-foreground">Flood Barriers / Elevated Utilities installed?</span>
+              </label>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <Checkbox
+                  checked={formState.resilience?.seismicRetrofit ?? false}
+                  onCheckedChange={(v) => update({ resilience: { ...formState.resilience, seismicRetrofit: !!v } })}
+                  className="mt-0.5"
+                />
+                <span className="text-xs text-foreground">Seismic Retrofitting (Dampers/Bracing)?</span>
+              </label>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <Checkbox
+                  checked={formState.resilience?.heatReflective ?? false}
+                  onCheckedChange={(v) => update({ resilience: { ...formState.resilience, heatReflective: !!v } })}
+                  className="mt-0.5"
+                />
+                <span className="text-xs text-foreground">Heat-Reflective Glass / Cool Roof?</span>
+              </label>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
         <Button
           onClick={handleAnalyze}
           disabled={isAnalyzing}
