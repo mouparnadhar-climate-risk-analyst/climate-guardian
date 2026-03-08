@@ -36,11 +36,13 @@ const FinancialRiskSection = ({ assetValue, lossPerDecade }: FinancialRiskSectio
 
   const rows = useMemo(() => {
     const decades = [
-      { year: 2025, scenario: "Baseline", decadesOut: 0 },
-      { year: 2035, scenario: "RCP 4.5", decadesOut: 1 },
-      { year: 2045, scenario: "RCP 4.5", decadesOut: 2 },
-      { year: 2055, scenario: "RCP 8.5", decadesOut: 3 },
-      { year: 2065, scenario: "RCP 8.5", decadesOut: 4 },
+      { year: 2025, scenario: "Baseline", decadesOut: 0, accel: 1 },
+      { year: 2035, scenario: "RCP 4.5", decadesOut: 1, accel: 1 },
+      { year: 2045, scenario: "RCP 4.5", decadesOut: 2, accel: 1 },
+      { year: 2055, scenario: "RCP 8.5", decadesOut: 3, accel: 1 },
+      { year: 2065, scenario: "RCP 8.5", decadesOut: 4, accel: 1 },
+      { year: 2075, scenario: "RCP 8.5", decadesOut: 5, accel: 1.4 },
+      { year: 2085, scenario: "RCP 8.5", decadesOut: 6, accel: 1.4 * 1.35 },
     ];
     return decades.map((d) => {
       const cumulativeLoss = 1 - Math.pow(1 - rate, d.decadesOut);
