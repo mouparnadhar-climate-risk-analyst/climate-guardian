@@ -40,6 +40,7 @@ export interface ProximityResult {
   severity: string;
   score: number;
   source: string;
+  status: DataStatus;
 }
 
 export interface AnalysisResult {
