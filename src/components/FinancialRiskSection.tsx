@@ -45,8 +45,8 @@ const FinancialRiskSection = ({ assetValue, lossPerDecade }: FinancialRiskSectio
       { year: 2085, scenario: "RCP 8.5", decadesOut: 6, accel: 1.4 * 1.35 },
     ];
     return decades.map((d) => {
-      const cumulativeLoss = 1 - Math.pow(1 - rate, d.decadesOut);
-      const pct = Math.min(cumulativeLoss, 0.99);
+      const baseLoss = 1 - Math.pow(1 - rate, d.decadesOut);
+      const pct = Math.min(baseLoss * d.accel, 0.99);
       const projected = baseValue * (1 - pct);
       const loss = baseValue * pct;
       const { risk, color } = riskLabel(pct);
