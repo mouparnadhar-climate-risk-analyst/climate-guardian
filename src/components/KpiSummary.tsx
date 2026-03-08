@@ -12,7 +12,7 @@ interface KpiSummaryProps {
   resilience?: ResilienceChecks;
 }
 
-const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
+const KpiSummary = ({ assetValue, analysisData, resilience }: KpiSummaryProps) => {
   const baseValue = useMemo(() => {
     const parsed = parseFloat(assetValue.replace(/[^0-9.]/g, ""));
     return isNaN(parsed) || parsed <= 0 ? 10_000_000 : parsed;
