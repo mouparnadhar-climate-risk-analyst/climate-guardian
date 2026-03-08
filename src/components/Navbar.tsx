@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Wand2, Download } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Wand2, Download, History, Trash2 } from "lucide-react";
 import { usePwaInstall } from "@/hooks/usePwaInstall";
+import { getHistory, clearHistory, type HistoryEntry } from "@/services/historyService";
+import { Badge } from "@/components/ui/badge";
 
 const VaultLogo = () => (
   <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -11,10 +15,27 @@ const VaultLogo = () => (
 
 interface NavbarProps {
   onDemo?: () => void;
+  onHistorySelect?: (entry: HistoryEntry) => void;
 }
 
-const Navbar = ({ onDemo }: NavbarProps) => {
+function riskColor(level: string) {
+  if (level === "LOW") return "bg-green-600";
+  if (level === "MEDIUM") return "bg-yellow-600";
+  if (level === "HIGH") return "bg-orange-600";
+  return "bg-destructive";
+}
+
+const Navbar = ({ onDemo, onHistorySelect }: NavbarProps) => {
   const { canInstall, install } = usePwaInstall();
+  const [open, setOpen] = useState(false);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+
+  const refreshHistory = () => setHistory(getHistory());
+
+  const handleClear = () => {
+    clearHistory();
+    setHistory([]);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -24,6 +45,56 @@ const Navbar = ({ onDemo }: NavbarProps) => {
           <span className="text-base md:text-lg font-bold tracking-wider text-foreground">CLIMATEVAULT</span>
         </div>
         <div className="flex items-center gap-2">
+          <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (v) refreshHistory(); }}>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-border text-muted-foreground hover:bg-secondary hover:text-foreground transition-all text-xs md:text-sm"
+              >
+                <History className="h-3.5 w-3.5 mr-1.5" />
+                History
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="bg-card border-border w-80">
+              <SheetHeader>
+                <SheetTitle className="text-foreground flex items-center justify-between">
+                  Recent Analyses
+                  {history.length > 0 && (
+                    <Button variant="ghost" size="sm" onClick={handleClear} className="text-muted-foreground hover:text-destructive h-7 px-2">
+                      <Trash2 className="h-3.5 w-3.5 mr-1" /> Clear
+                    </Button>
+                  )}
+                </SheetTitle>
+              </SheetHeader>
+              <div className="mt-4 space-y-2 overflow-y-auto max-h-[calc(100vh-8rem)]">
+                {history.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">No analyses yet. Run your first analysis to see it here.</p>
+                ) : (
+                  history.map((entry, i) => (
+                    <button
+                      key={`${entry.propertyName}-${entry.timestamp}`}
+                      className="w-full text-left rounded-lg border border-border bg-secondary/50 p-3 hover:bg-secondary transition-colors"
+                      onClick={() => { onHistorySelect?.(entry); setOpen(false); }}
+                    >
+                      <p className="text-sm font-medium text-foreground truncate">{entry.propertyName}</p>
+                      <div className="flex items-center justify-between mt-1.5">
+                        <span className="text-xs text-muted-foreground">
+                          {entry.assetValue ? `$${Number(entry.assetValue).toLocaleString()}` : "No value"}
+                        </span>
+                        <Badge variant="outline" className={`${riskColor(entry.riskLevel)} text-white border-none text-[10px] px-1.5 py-0`}>
+                          {entry.riskScore}/100
+                        </Badge>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground/60 mt-1">
+                        {new Date(entry.timestamp).toLocaleDateString()} {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </button>
+                  ))
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
           {canInstall && (
             <Button
               variant="outline"
