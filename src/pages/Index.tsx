@@ -77,33 +77,35 @@ const Index = () => {
       <Navbar onDemo={handleDemo} />
       <HeroSection />
       <main className="container pb-12 px-4 md:px-6">
-        <KpiSummary assetValue={assetValue} analysisData={analysisData} />
-        {analysisData && (
-          <EstimatedWarningCard data={analysisData} onRetry={handleRetry} />
-        )}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6">
-          <div className="lg:col-span-2">
-            <AssetDetailsPanel
-              onAnalyze={handleAnalyze}
-              assetValue={assetValue}
-              onAssetValueChange={setAssetValue}
-              isAnalyzing={isAnalyzing}
-              formState={formState}
-              onFormStateChange={setFormState}
-            />
+        <div id="report-capture-area">
+          <KpiSummary assetValue={assetValue} analysisData={analysisData} />
+          {analysisData && (
+            <EstimatedWarningCard data={analysisData} onRetry={handleRetry} />
+          )}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6">
+            <div className="lg:col-span-2">
+              <AssetDetailsPanel
+                onAnalyze={handleAnalyze}
+                assetValue={assetValue}
+                onAssetValueChange={setAssetValue}
+                isAnalyzing={isAnalyzing}
+                formState={formState}
+                onFormStateChange={setFormState}
+              />
+            </div>
+            <div className="lg:col-span-3">
+              <RiskMap analysisLocation={analysisLocation} />
+            </div>
           </div>
-          <div className="lg:col-span-3">
-            <RiskMap analysisLocation={analysisLocation} />
-          </div>
+          <FinancialRiskSection assetValue={assetValue} lossPerDecade={analysisData?.lossPerDecade} />
+          {analysisData ? (
+            <RiskFactors data={analysisData} />
+          ) : (
+            <DisasterScenarios assetValue={assetValue} />
+          )}
+          {analysisData && <DataSourcesPanel data={analysisData} />}
         </div>
-        <FinancialRiskSection assetValue={assetValue} lossPerDecade={analysisData?.lossPerDecade} />
-        {analysisData ? (
-          <RiskFactors data={analysisData} />
-        ) : (
-          <DisasterScenarios assetValue={assetValue} />
-        )}
-        {analysisData && <DataSourcesPanel data={analysisData} />}
-        <ExportButton />
+        <ExportButton propertyName={formState.propertyName} />
       </main>
       <Footer />
       <MobileStickyBar onAnalyze={handleMobileAnalyze} isAnalyzing={isAnalyzing} />
