@@ -12,7 +12,7 @@ const ExportButton = () => {
     <div className="mt-12 flex justify-center print:hidden">
       <Button
         onClick={handleExport}
-        className="w-full max-w-md bg-primary hover:bg-primary/85 text-primary-foreground font-bold py-4 h-14 rounded-xl text-base glow-primary-intense transition-all"
+        className="whitespace-normal text-sm md:text-base h-auto py-3 leading-snug"
       >
         <Download className="h-5 w-5 mr-2" />
         Download TCFD/CSRD Climate Risk Report (PDF)

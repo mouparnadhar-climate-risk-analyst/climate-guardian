@@ -39,20 +39,23 @@ const Navbar = ({ onDemo, onHistorySelect }: NavbarProps) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-      <div className="container flex h-14 md:h-16 items-center justify-between">
-        <div className="flex items-center gap-2 md:gap-3">
+      {/* FIXED: Changed h-14 to min-h-[3.5rem] and added py-2 to allow expanding on mobile */}
+      <div className="container flex min-h-[3.5rem] md:min-h-[4rem] py-2 md:py-0 items-center justify-between flex-wrap gap-y-2">
+        
+        <div className="flex items-center gap-2 md:gap-3 shrink-0">
           <VaultLogo />
           <span className="text-base md:text-lg font-bold tracking-wider text-foreground">CLIMATEVAULT</span>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* FIXED: Added flex-wrap and justify-end here */}
+        <div className="flex flex-wrap justify-end items-center gap-1.5 md:gap-2">
           <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (v) refreshHistory(); }}>
             <SheetTrigger asChild>
               <Button
                 variant="outline"
-                size="sm"
-                className="border-border text-muted-foreground hover:bg-secondary hover:text-foreground transition-all text-xs md:text-sm"
+                className="border-border text-muted-foreground hover:bg-secondary hover:text-foreground transition-all text-[11px] md:text-sm h-8 md:h-9 px-2 md:px-4"
               >
-                <History className="h-3.5 w-3.5 mr-1.5" />
+                <History className="h-3.5 w-3.5 mr-1" />
                 History
               </Button>
             </SheetTrigger>
@@ -95,24 +98,24 @@ const Navbar = ({ onDemo, onHistorySelect }: NavbarProps) => {
               </div>
             </SheetContent>
           </Sheet>
+
           {canInstall && (
             <Button
               variant="outline"
-              size="sm"
-              className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-all text-xs md:text-sm"
+              className="border-accent text-accent hover:bg-accent hover:text-accent-foreground transition-all text-[11px] md:text-sm h-8 md:h-9 px-2 md:px-4"
               onClick={install}
             >
-              <Download className="h-3.5 w-3.5 mr-1.5" />
-              Install App
+              <Download className="h-3.5 w-3.5 mr-1" />
+              Install
             </Button>
           )}
+
           <Button
             variant="outline"
-            size="sm"
-            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all text-xs md:text-sm"
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all text-[11px] md:text-sm h-8 md:h-9 px-2 md:px-4"
             onClick={onDemo}
           >
-            <Wand2 className="h-3.5 w-3.5 mr-1.5" />
+            <Wand2 className="h-3.5 w-3.5 mr-1" />
             Demo Mode
           </Button>
         </div>
