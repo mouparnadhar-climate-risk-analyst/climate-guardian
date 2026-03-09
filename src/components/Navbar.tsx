@@ -42,13 +42,13 @@ const Navbar = ({ onDemo, onHistorySelect }: NavbarProps) => {
       {/* FIXED: Changed h-14 to min-h-[3.5rem] and added py-2 to allow expanding on mobile */}
       <div className="container flex min-h-[3.5rem] md:min-h-[4rem] py-2 md:py-0 items-center justify-between flex-wrap gap-y-2">
         
-        <div className="flex items-center gap-2 md:gap-3 shrink-0">
+        <div className="flex items-center justify-center w-full md:w-auto md:justify-start gap-2 md:gap-3 shrink-0">
           <VaultLogo />
           <span className="text-base md:text-lg font-bold tracking-wider text-foreground">CLIMATEVAULT</span>
         </div>
 
         {/* FIXED: Added flex-wrap and justify-end here */}
-        <div className="flex flex-wrap justify-end items-center gap-1.5 md:gap-2">
+        <div className="flex flex-wrap justify-center w-full md:w-auto md:justify-end items-center gap-1.5 md:gap-2">
           <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (v) refreshHistory(); }}>
             <SheetTrigger asChild>
               <Button
