@@ -121,12 +121,12 @@ export async function geocode(address: string): Promise<GeoLocation> {
 export async function fetchElevation(lat: number, lon: number): Promise<ElevationResult> {
   try {
     const res = await fetch(
-      `https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lon}`,
-      { signal: AbortSignal.timeout(8000) }
+      `https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lon}`
     );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const elev: number = data?.elevation?.[0] ?? 3.2;
+    const elevationValue: number = data.elevation[0];
+    const elev: number = elevationValue !== undefined && elevationValue !== null ? elevationValue : 3.2;
     const sev = elevationSeverity(elev);
     return { elevation: elev, severity: sev, score: severityToScore[sev], source: "Open-Meteo Elevation API", status: "LIVE" };
   } catch {
