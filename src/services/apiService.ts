@@ -121,18 +121,19 @@ export async function geocode(address: string): Promise<GeoLocation> {
 export async function fetchElevation(lat: number, lon: number): Promise<ElevationResult> {
   try {
     const res = await fetch(
-      `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lon}`,
+      `https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lon}`,
       { signal: AbortSignal.timeout(8000) }
     );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const elev: number = data?.results?.[0]?.elevation ?? 3.2;
+    const elev: number = data?.elevation?.[0] ?? 3.2;
     const sev = elevationSeverity(elev);
-    return { elevation: elev, severity: sev, score: severityToScore[sev], source: "Open Elevation API", status: "LIVE" };
+    return { elevation: elev, severity: sev, score: severityToScore[sev], source: "Open-Meteo Elevation API", status: "LIVE" };
   } catch {
     // silent fallback
   }
   const sev = elevationSeverity(3.2);
-  return { elevation: 3.2, severity: sev, score: severityToScore[sev], source: "Open Elevation API (fallback)", status: "ESTIMATED" };
+  return { elevation: 3.2, severity: sev, score: severityToScore[sev], source: "Open-Meteo Elevation API (fallback)", status: "ESTIMATED" };
 }
 
 // STEP 3 — Earthquake risk
