@@ -1,73 +1,52 @@
-# Welcome to your Lovable project
+# 🛡️ ClimateVault
 
-## Project info
+> **Know Your Asset's Future Before the Market Does.**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+![ClimateVault Interface](https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop)
 
-## How can I edit this code?
+**ClimateVault** is an institutional-grade ESG (Environmental, Social, and Governance) intelligence platform. It conducts deep environmental stress tests on global real estate assets, synthesizing real-time geospatial data to calculate 60-year financial risk projections based on IPCC climate scenarios.
 
-There are several ways of editing your application.
+🔗 **[View Live Application](https://climate-guardian-blond.vercel.app/)** 
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 🚀 Key Features
 
-Changes made via Lovable will be committed automatically to this repo.
+* **Real-Time Data Synthesis:** Aggregates live data from 5 global environmental APIs to assess precise localized risk, circumventing the need for static historical datasets.
+* **60-Year Financial Modeling:** Calculates asset depreciation, value loss, and insurance premium spikes through the year 2085 using RCP 4.5 and RCP 8.5 climate trajectories.
+* **Interactive Geospatial Intelligence:** Features a high-end, dark-mode Mapbox UI that dynamically maps extreme, high, and moderate risk zones (500m to 3km radii) around the asset.
+* **Enterprise Reporting Engine:** Generates instant, A4-ready **TCFD/CSRD Executive PDF Reports** natively via CSS Print Media styling, entirely bypassing canvas-taint limitations.
+* **Resilience & Fallback Architecture:** Engineered with graceful API error handling. If a third-party server times out, the system injects regional fallback estimates, preserving 100% UI uptime and transparency (`🟢 LIVE` vs `🟡 ESTIMATED` badges).
+* **Progressive Web App (PWA):** Fully installable as a standalone native application on both mobile and desktop environments.
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 📡 Data Architecture & APIs
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+ClimateVault relies on a robust data pipeline, pulling from the following live sources:
 
-Follow these steps:
+1. **[Nominatim (OpenStreetMap)](https://nominatim.org/):** Global geocoding and coordinate extraction.
+2. **[Open-Elevation](https://open-elevation.com/) / [Open-Meteo](https://open-meteo.com/):** High-precision topographical data for sea-level rise and flood inundation risk.
+3. **[USGS Earthquake Hazards Program](https://earthquake.usgs.gov/):** 25-year historical seismic activity scanning within a 200km radius.
+4. **[Open-Meteo Historical Weather](https://open-meteo.com/):** 90-day meteorological stress testing (tracking days >35°C and extreme rainfall >50mm).
+5. **[Overpass API](https://overpass-api.de/):** Distance calculations to nearest coastlines and major river systems for storm surge modeling.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 💻 Tech Stack
 
-# Step 3: Install the necessary dependencies.
-npm i
+* **Frontend Framework:** React 18, TypeScript, Vite
+* **Styling:** Tailwind CSS, Shadcn UI, Glassmorphism UI design
+* **Geospatial:** Leaflet.js, React-Leaflet, Mapbox Dark Tiles
+* **Data Visualization:** Recharts
+* **Deployment (CI/CD):** Vercel (Primary), Netlify (Fail-safe Backup)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
+## 🛠️ Local Development
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+To run ClimateVault locally on your machine:
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+**1. Clone the repository:**
+```bash
+git clone https://github.com/mouparnadhar-climate-risk-analyst/climate-guardian.git
