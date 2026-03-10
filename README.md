@@ -45,8 +45,19 @@ ClimateVault relies on a robust data pipeline, pulling from the following live s
 
 ## 🛠️ Local Development
 
-To run ClimateVault locally on your machine:
+Follow these steps to run ClimateVault locally on your machine:
 
-**1. Clone the repository:**
+**1. Clone the repository and navigate inside:**
 ```bash
 git clone https://github.com/mouparnadhar-climate-risk-analyst/climate-guardian.git
+cd climate-guardian
+```
+**2. Navigate to the directory:**
+```bash
+npm install
+```
+**3. Install dependencies:**
+```bash
+npm run dev
+```
+The application will now be running live at http://localhost:5173
