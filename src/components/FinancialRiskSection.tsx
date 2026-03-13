@@ -1,3 +1,4 @@
+// Final deployment check
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { TrendingDown } from "lucide-react";
