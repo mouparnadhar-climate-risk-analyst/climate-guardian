@@ -1,63 +1,79 @@
 # 🛡️ ClimateVault
 
-> **Climate Risk Intelligence for Global Assets**
+> **Institutional-Grade Climate Risk Intelligence & Financial Modeling.**
 
 ![ClimateVault Interface](https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop)
 
-**ClimateVault** is an institutional-grade ESG (Environmental, Social, and Governance) intelligence platform. It conducts deep environmental stress tests on global real estate assets, synthesising real-time geospatial data to calculate 60-year financial risk projections based on IPCC climate scenarios.
+**ClimateVault** is a professional ESG intelligence platform designed for global real estate investors and institutional fund managers. It translates complex environmental science into actionable financial data, conducting deep stress tests to project asset viability through a 60-year climate horizon.
 
-🔗 **[View Live Application](https://climate-guardian-blond.vercel.app/)** 
+🔗 **[Launch Live Application](https://climate-guardian-blond.vercel.app/)** 
 
 ---
 
-## 🚀 Key Features
+## 🚀 Advanced Enterprise Features
 
-* **Real-Time Data Synthesis:** Aggregates live data from 5 global environmental APIs to assess precise localised risk, circumventing the need for static historical datasets.
-* **60-Year Financial Modelling:** Calculates asset depreciation, value loss, and insurance premium spikes through the year 2085 using RCP 4.5 and RCP 8.5 climate trajectories.
-* **Interactive Geospatial Intelligence:** Features a high-end, dark-mode Mapbox UI that dynamically maps extreme, high, and moderate risk zones (500m to 3km radii) around the asset.
-* **Enterprise Reporting Engine:** Generates instant, A4-ready **TCFD/CSRD Executive PDF Reports** natively via CSS Print Media styling, entirely bypassing canvas-taint limitations.
-* **Resilience & Fallback Architecture:** Engineered with graceful API error handling. If a third-party server times out, the system injects regional fallback estimates, preserving 100% UI uptime and transparency (`🟢 LIVE` vs `🟡 ESTIMATED` badges).
-* **Progressive Web App (PWA):** Fully installable as a standalone native application on both mobile and desktop environments.
+### ⏳ Stranded Asset Countdown
+A predictive engine that calculates the exact **Year of Obsolescence**. It identifies the tipping point where compounding physical risks and regulatory penalties render an asset uninsurable or commercially non-viable.
+
+### 🏝️ Infrastructure Severance (The "Island Effect")
+Goes beyond the building to analyse the neighbourhood. Uses geospatial intelligence to calculate the probability of isolation—where an asset remains safe, but the surrounding critical infrastructure (hospitals, power grids, roads) fails.
+
+### ⚖️ Regulatory Transition Risk (Local Law 97)
+Predicts financial exposure to emerging global decarbonization mandates. It calculates estimated annual carbon tax penalties based on property age, type, and square footage.
+
+### 📈 Multi-Scenario Financial Projections
+Dynamic modelling of asset depreciation and insurance premium spikes through **2085**, utilising IPCC AR6 (RCP 4.5 and RCP 8.5) trajectories.
+
+### 📄 Institutional Export Engine
+* **AI Strategic Reports:** Generates clean, white-paper PDF executive summaries with site-specific adaptation strategies.
+* **Raw Data Export:** Instant CSV generation for integration into proprietary institutional financial models.
 
 ---
 
 ## 📡 Data Architecture & APIs
 
-ClimateVault relies on a robust data pipeline, pulling from the following live sources:
+ClimateVault synthesises real-time data from 6 specialised global sources:
 
-1. **[Nominatim (OpenStreetMap)](https://nominatim.org/):** Global geocoding and coordinate extraction.
-2. **[Open-Elevation](https://open-elevation.com/) / [Open-Meteo](https://open-meteo.com/):** High-precision topographical data for sea-level rise and flood inundation risk.
-3. **[USGS Earthquake Hazards Program](https://earthquake.usgs.gov/):** 25-year historical seismic activity scanning within a 200km radius.
-4. **[Open-Meteo Historical Weather](https://open-meteo.com/):** 90-day meteorological stress testing (tracking days >35°C and extreme rainfall >50mm).
-5. **[Overpass API](https://overpass-api.de/):** Distance calculations to nearest coastlines and major river systems for storm surge modelling.
+1. **[Nominatim (OSM)](https://nominatim.org/):** Global geocoding and coordinate extraction.
+2. **[Open-Meteo Elevation](https://open-meteo.com/):** High-precision topography for inundation modeling.
+3. **[USGS Earthquake Hazards](https://earthquake.usgs.gov/):** 25-year historical seismic activity scanning.
+4. **[Open-Meteo Historical Weather](https://open-meteo.com/):** Thermal stress and wind velocity analysis (Hurricane force detection).
+5. **[Overpass API](https://overpass-api.de/):** Distance modelling for coastal/river proximity and critical infrastructure density.
+6. **[Supabase](https://supabase.com/):** Backend infrastructure for session persistence and data handling.
 
 ---
 
 ## 💻 Tech Stack
 
-* **Frontend Framework:** React 18, TypeScript, Vite
-* **Styling:** Tailwind CSS, Shadcn UI, Glassmorphism UI design
-* **Geospatial:** Leaflet.js, React-Leaflet, Mapbox Dark Tiles
-* **Data Visualization:** Recharts
-* **Deployment (CI/CD):** Vercel (Primary), Netlify (Fail-safe Backup)
+* **Frontend:** React 18, TypeScript, Vite, Framer Motion
+* **Styling:** Tailwind CSS, Shadcn UI, Advanced Glassmorphism Design
+* **Visualization:** Recharts (Financial Modeling), Mapbox GL (Geospatial Mapping)
+* **Reporting:** jsPDF & CSS Print Media (Native Document Generation)
+* **Deployment:** Vercel (Production), Netlify (Fail-safe Backup)
 
 ---
 
 ## 🛠️ Local Development
 
-Follow these steps to run ClimateVault locally on your machine:
+Follow these steps to run the ClimateVault engine locally:
 
 **1. Clone the repository and navigate inside:**
 ```bash
 git clone https://github.com/mouparnadhar-climate-risk-analyst/climate-guardian.git
 cd climate-guardian
+
 ```
-**2. Navigate to the directory:**
+2. Install the required dependencies:
 ```bash
-npm install
+   npm install
 ```
-**3. Install dependencies:**
-```bash
-npm run dev
-```
-The application will now be running live at http://localhost:5173
+3. Start the development server:
+   ```bash
+   
+   npm run dev
+   ```
+**👩‍💻Author**
+
+**Mouparna Dhar**
+Bridging the gap between climate science and global capital markets.
+Built during the She Builds Global Hackathon.
