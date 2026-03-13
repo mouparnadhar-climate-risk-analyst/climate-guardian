@@ -1,152 +1,207 @@
-import { motion } from "framer-motion";
-import { Mountain, Waves, Activity, ThermometerSun, Droplets, AlertTriangle } from "lucide-react";
-import type { AnalysisResult, DataStatus } from "@/services/apiService";
-
-const SEVERITY_COLORS: Record<string, string> = {
-  MINIMAL: "bg-green-500",
-  LOW: "bg-emerald-500",
-  MEDIUM: "bg-yellow-500",
-  HIGH: "bg-orange-500",
-  EXTREME: "bg-destructive",
-};
-
-const SEVERITY_WIDTH: Record<string, string> = {
-  MINIMAL: "w-[10%]",
-  LOW: "w-[25%]",
-  MEDIUM: "w-[50%]",
-  HIGH: "w-[75%]",
-  EXTREME: "w-[95%]",
-};
+import { Waves, ThermometerSun, CloudRain, Activity, Wind, Navigation, Unplug, Gavel } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import type { AnalysisResult } from "@/services/apiService";
 
 interface RiskFactorsProps {
   data: AnalysisResult;
 }
 
-const StatusBadge = ({ status }: { status: DataStatus }) => {
-  if (status === "LIVE") {
-    return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-900/20 text-emerald-400">
-        🟢 LIVE DATA
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-yellow-900/20 text-yellow-400">
-      🟡 ESTIMATED
-    </span>
-  );
-};
-
 const RiskFactors = ({ data }: RiskFactorsProps) => {
-  const factors = [
-    {
-      icon: Mountain,
-      iconColor: "text-amber-400",
-      name: "Elevation Risk",
-      severity: data.elevation.severity,
-      detail: `Elevation: ${data.elevation.elevation}m above sea level`,
-      explanation: "Low-lying assets face significantly higher flood and storm surge exposure.",
-      source: data.elevation.source,
-      status: data.elevation.status,
-    },
-    {
-      icon: Waves,
-      iconColor: "text-primary",
-      name: "Coastal Proximity",
-      severity: data.coastal.severity,
-      detail: `Distance to coast: ${data.coastal.distanceKm}km`,
-      explanation: "Proximity to coastline increases exposure to storm surges, saltwater intrusion, and sea-level rise.",
-      source: data.coastal.source,
-      status: data.coastal.status,
-    },
-    {
-      icon: Activity,
-      iconColor: "text-purple-400",
-      name: "Seismic Activity",
-      severity: data.earthquake.severity,
-      detail: `${data.earthquake.count} significant earthquakes (M4.0+) since 2000`,
-      explanation: "Seismic history indicates structural risk from tectonic activity in the region.",
-      source: data.earthquake.source,
-      status: data.earthquake.status,
-    },
-    {
-      icon: ThermometerSun,
-      iconColor: "text-orange-400",
-      name: "Heat Stress",
-      severity: data.climate.heatStressDays > 14 ? "HIGH" : data.climate.heatStressDays > 5 ? "MEDIUM" : "LOW",
-      detail: `${data.climate.heatStressDays} days >35°C in last 90 days (avg max: ${data.climate.avgMaxTemp}°C)`,
-      explanation: "Extreme heat degrades infrastructure, increases cooling costs, and reduces asset lifespan.",
-      source: data.climate.source,
-      status: data.climate.status,
-    },
-    {
-      icon: Droplets,
-      iconColor: "text-blue-400",
-      name: "River Flood Risk",
-      severity: data.river.severity,
-      detail: `Distance to nearest river: ${data.river.distanceKm}km`,
-      explanation: "Proximity to rivers increases risk of fluvial flooding events during heavy rainfall.",
-      source: data.river.source,
-      status: data.river.status,
-    },
-  ];
+  // Helper to determine severity color
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case "EXTREME": return "bg-red-500 text-white";
+      case "HIGH": return "bg-orange-500 text-white";
+      case "MEDIUM": return "bg-yellow-600 text-white";
+      default: return "bg-emerald-500 text-white";
+    }
+  };
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-      className="mt-10"
-    >
-      <div className="flex items-center gap-3 mb-6">
-        <AlertTriangle className="h-6 w-6 text-warning" />
-        <h2 className="text-xl md:text-2xl font-bold text-foreground">
+    <section className="mt-12">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <Activity className="w-5 h-5 text-orange-500" />
           Climate Risk Factors
         </h2>
-        <span className="ml-auto text-sm font-semibold px-3 py-1 rounded-full bg-card border border-border text-foreground">
+        <Badge variant="outline" className="bg-white/5 border-white/10 text-white px-3 py-1">
           Score: {data.overallScore}/100 — {data.riskLevel}
-        </span>
+        </Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {factors.map((f) => {
-          const Icon = f.icon;
-          return (
-            <div
-              key={f.name}
-              className="rounded-lg border border-border bg-card/60 backdrop-blur-md p-5"
-            >
-              <div className="flex items-start gap-4">
-                <div className="rounded-lg bg-secondary/50 p-2.5">
-                  <Icon className={`h-6 w-6 ${f.iconColor}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-semibold text-foreground text-base">{f.name}</h3>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <StatusBadge status={f.status} />
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${SEVERITY_COLORS[f.severity]} text-white`}>
-                        {f.severity}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Severity bar */}
-                  <div className="mt-3 h-2 w-full rounded-full bg-secondary/50 overflow-hidden">
-                    <div className={`h-full rounded-full ${SEVERITY_COLORS[f.severity]} ${SEVERITY_WIDTH[f.severity]} transition-all duration-700`} />
-                  </div>
-
-                  <p className="mt-3 text-sm text-foreground">{f.detail}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{f.explanation}</p>
-                  <p className="text-xs text-muted-foreground/50 mt-1 italic">Source: {f.source}</p>
-                </div>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        {/* 1. Elevation Risk Card */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-cyan-500/10 rounded-lg">
+              <Navigation className="w-6 h-6 text-cyan-400 rotate-180" />
             </div>
-          );
-        })}
+            <Badge variant="outline" className={`${data.elevation.status === 'LIVE' ? 'bg-emerald-900/20 text-emerald-400' : 'bg-yellow-900/20 text-yellow-400'} border-none text-[10px]`}>
+              {data.elevation.status === 'LIVE' ? '🟢 LIVE DATA' : '🟡 ESTIMATED'}
+            </Badge>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1">ELEVATION RISK — {data.elevation.severity}</h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Real data: <strong>{data.elevation.elevation}m</strong> above sea level. Low-lying assets face significantly higher flood and storm surge exposure.
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div className="h-full bg-cyan-400" style={{ width: `${data.elevation.score}%` }}></div>
+          </div>
+        </div>
+
+        {/* 2. Coastal Proximity Card */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-blue-500/10 rounded-lg">
+              <Waves className="w-6 h-6 text-blue-400" />
+            </div>
+            <Badge variant="outline" className={`${data.coastal.status === 'LIVE' ? 'bg-emerald-900/20 text-emerald-400' : 'bg-yellow-900/20 text-yellow-400'} border-none text-[10px]`}>
+              {data.coastal.status === 'LIVE' ? '🟢 LIVE DATA' : '🟡 ESTIMATED'}
+            </Badge>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1">COASTAL PROXIMITY — {data.coastal.severity}</h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Distance to coast: <strong>{data.coastal.distanceKm}km</strong>. Proximity to coastline increases exposure to saltwater intrusion and sea-level rise.
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div className="h-full bg-blue-400" style={{ width: `${data.coastal.score}%` }}></div>
+          </div>
+        </div>
+
+        {/* 3. Seismic Activity Card */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-purple-500/10 rounded-lg">
+              <Activity className="w-6 h-6 text-purple-400" />
+            </div>
+            <Badge variant="outline" className={`${data.earthquake.status === 'LIVE' ? 'bg-emerald-900/20 text-emerald-400' : 'bg-yellow-900/20 text-yellow-400'} border-none text-[10px]`}>
+              {data.earthquake.status === 'LIVE' ? '🟢 LIVE DATA' : '🟡 ESTIMATED'}
+            </Badge>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1">SEISMIC ACTIVITY — {data.earthquake.severity}</h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Detected <strong>{data.earthquake.count}</strong> earthquakes (Mag 4.0+) within 200km in the last 25 years.
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div className="h-full bg-purple-400" style={{ width: `${data.earthquake.score}%` }}></div>
+          </div>
+        </div>
+
+        {/* 4. Heat Stress Card */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-orange-500/10 rounded-lg">
+              <ThermometerSun className="w-6 h-6 text-orange-400" />
+            </div>
+            <Badge variant="outline" className={`${data.climate.status === 'LIVE' ? 'bg-emerald-900/20 text-emerald-400' : 'bg-yellow-900/20 text-yellow-400'} border-none text-[10px]`}>
+              {data.climate.status === 'LIVE' ? '🟢 LIVE DATA' : '🟡 ESTIMATED'}
+            </Badge>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1">HEAT STRESS — {data.climate.severity}</h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Average Max Temp: <strong>{data.climate.avgMaxTemp}°C</strong>. {data.climate.heatStressDays} days above 35°C in the last 90 days.
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div className="h-full bg-orange-400" style={{ width: `${data.climate.score}%` }}></div>
+          </div>
+        </div>
+
+        {/* 5. River Flood Risk Card */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-indigo-500/10 rounded-lg">
+              <CloudRain className="w-6 h-6 text-indigo-400" />
+            </div>
+            <Badge variant="outline" className={`${data.river.status === 'LIVE' ? 'bg-emerald-900/20 text-emerald-400' : 'bg-yellow-900/20 text-yellow-400'} border-none text-[10px]`}>
+              {data.river.status === 'LIVE' ? '🟢 LIVE DATA' : '🟡 ESTIMATED'}
+            </Badge>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1">RIVER FLOOD RISK — {data.river.severity}</h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Nearest major river: <strong>{data.river.distanceKm}km</strong>. Flash flooding risk is elevated for assets within drainage basins.
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div className="h-full bg-indigo-400" style={{ width: `${data.river.score}%` }}></div>
+          </div>
+        </div>
+
+        {/* 6. NEW: Wind & Storm Risk Card */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-blue-500/10 rounded-lg">
+              <Wind className="w-6 h-6 text-blue-400" />
+            </div>
+            <div className="flex flex-col items-end">
+              <Badge variant="outline" className={`${data.climate.status === 'LIVE' ? 'bg-emerald-900/20 text-emerald-400' : 'bg-yellow-900/20 text-yellow-400'} border-none text-[10px] mb-1`}>
+                {data.climate.status === 'LIVE' ? '🟢 LIVE DATA' : '🟡 ESTIMATED'}
+              </Badge>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${getSeverityColor(data.climate.windSeverity)}`}>
+                {data.climate.windSeverity}
+              </span>
+            </div>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">WIND & STORM RISK</h3>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+            Peak wind speeds of <strong>{data.climate.maxWindSpeed} km/h</strong> detected. High velocity winds threaten structural integrity and increase debris impact risk.
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-blue-400 transition-all duration-1000" 
+              style={{ width: `${data.climate.maxWindSpeed > 150 ? 100 : (data.climate.maxWindSpeed / 150) * 100}%` }}
+            ></div>
+          </div>
+
+          {/* NEW: Infrastructure Island Effect Card */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-pink-500/10 rounded-lg">
+              <Unplug className="w-6 h-6 text-pink-400" />
+            </div>
+            <div className="flex flex-col items-end">
+              <Badge variant="outline" className={`${data.infrastructure.status === 'LIVE' ? 'bg-emerald-900/20 text-emerald-400' : 'bg-yellow-900/20 text-yellow-400'} border-none text-[10px] mb-1`}>
+                {data.infrastructure.status === 'LIVE' ? '🟢 LIVE DATA' : '🟡 ESTIMATED'}
+              </Badge>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${getSeverityColor(data.infrastructure.severanceRisk)}`}>
+                {data.infrastructure.severanceRisk}
+              </span>
+            </div>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">Infrastructure Severance</h3>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+            <strong>{data.infrastructure.probability}% probability</strong> of the "Island Effect". Asset may survive an event, but critical surrounding infrastructure (hospitals, power grids, roads) will fail, rendering the asset inaccessible.
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div className="h-full bg-pink-400" style={{ width: `${data.infrastructure.probability}%` }}></div>
+          </div>
+        </div>
+
+        {/* NEW: Regulatory Transition Risk Card (Local Law 97) */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-emerald-500/10 rounded-lg">
+              <Gavel className="w-6 h-6 text-emerald-400" />
+            </div>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${data.carbonFine > 0 ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'}`}>
+              {data.carbonFine > 0 ? 'HIGH RISK' : 'COMPLIANT'}
+            </span>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">Regulatory Transition Risk</h3>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+            {data.carbonFine > 0 ? (
+              <>Projected <strong>${data.carbonFine.toLocaleString()}</strong> in annual carbon tax penalties (e.g. NYC Local Law 97) due to property age and low energy efficiency compliance.</>
+            ) : (
+              <>Asset is currently compliant with imminent decarbonization mandates. No carbon tax penalties projected in the short term.</>
+            )}
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div className="h-full bg-emerald-400" style={{ width: `${data.carbonFine > 0 ? 80 : 10}%` }}></div>
+          </div>
+        </div>
+        </div>
+
       </div>
-    </motion.section>
+    </section>
   );
 };
 

@@ -1,86 +1,93 @@
-import { useMemo } from "react";
-import { ShieldAlert, TrendingDown, ShieldCheck, FileText } from "lucide-react";
+import { ShieldAlert, TrendingDown, ShieldCheck, FileText, Zap, TrendingUp, Hourglass } from "lucide-react";
 import type { AnalysisResult } from "@/services/apiService";
-import type { ResilienceChecks } from "@/components/AssetDetailsPanel";
-
-const fmt = (n: number) =>
-  "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
 
 interface KpiSummaryProps {
   assetValue: string;
-  analysisData?: AnalysisResult | null;
-  resilience?: ResilienceChecks;
+  analysisData: AnalysisResult | null;
 }
 
-const KpiSummary = ({ assetValue, analysisData, resilience }: KpiSummaryProps) => {
-  const baseValue = useMemo(() => {
-    const parsed = parseFloat(assetValue.replace(/[^0-9.]/g, ""));
-    return isNaN(parsed) || parsed <= 0 ? 10_000_000 : parsed;
-  }, [assetValue]);
+const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
+  if (!analysisData) return null;
 
-  const riskScore = analysisData?.overallScore ?? 73;
-  const lossRate = analysisData?.lossPerDecade ?? 0.10;
-  const loss2065 = 1 - Math.pow(1 - lossRate, 4);
-
-  const cards = [
-    {
-      title: "Overall Risk Score",
-      value: `${riskScore}/100`,
-      valueClass: "text-primary",
-      subtitle: analysisData
-        ? `${analysisData.riskLevel} — ${riskScore > 60 ? "Immediate action recommended" : "Monitor periodically"}`
-        : "HIGH RISK — Immediate action recommended",
-      icon: ShieldAlert,
-    },
-    {
-      title: "Value Loss by 2065",
-      value: fmt(baseValue * loss2065),
-      valueClass: "text-destructive",
-      subtitle: analysisData ? "Based on live geospatial analysis" : "Under RCP 8.5 scenario",
-      icon: TrendingDown,
-    },
-    {
-      title: "Adaptation Budget",
-      value: (() => {
-        let rate = 0.08;
-        const checks = [resilience?.floodBarriers, resilience?.seismicRetrofit, resilience?.heatReflective].filter(Boolean).length;
-        rate = Math.max(0.02, rate - checks * 0.015);
-        return fmt(baseValue * rate);
-      })(),
-      valueClass: "text-emerald-400",
-      subtitle: resilience && (resilience.floodBarriers || resilience.seismicRetrofit || resilience.heatReflective)
-        ? "Reduced — resilience measures in place"
-        : "To reduce risk score to < 45",
-      icon: ShieldCheck,
-    },
-    {
-      title: "Insurance Premium",
-      value: "+34% by 2035",
-      valueClass: "text-warning",
-      subtitle: "Based on trajectory",
-      icon: FileText,
-    },
-  ];
+  const valueNum = Number(assetValue) || 10000000;
+  // Calculate 2065 loss based on 4 decades of compounded loss
+  const lossPercent2065 = Math.round((1 - Math.pow(1 - analysisData.lossPerDecade, 4)) * 100);
+  const valueLoss = Math.round(valueNum * (lossPercent2065 / 100));
+  const adaptationBudget = Math.round(valueNum * analysisData.adaptationCostPercent);
 
   return (
-    <div id="kpi-summary" className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-      {cards.map((card) => {
-        const Icon = card.icon;
-        return (
-          <div
-            key={card.title}
-            className="rounded-lg border border-border bg-card/60 backdrop-blur-md p-3 md:p-4"
-          >
-            <div className="flex items-center gap-1.5 md:gap-2 mb-1.5 md:mb-2">
-              <Icon className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground" />
-              <span className="text-[10px] md:text-xs text-muted-foreground font-medium">{card.title}</span>
-            </div>
-            <p className={`text-lg md:text-2xl font-bold ${card.valueClass}`}>{card.value}</p>
-            <p className="text-[10px] md:text-xs text-muted-foreground/60 mt-1">{card.subtitle}</p>
+    <>
+      {/* 🚨 NEW: STRANDED ASSET COUNTDOWN CLOCK 🚨 */}
+      <div className={`mb-6 p-5 md:p-6 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${analysisData.strandedYear < 2050 ? 'bg-red-950/40 border-red-500/50 shadow-[0_0_30px_rgba(239,68,68,0.15)]' : 'bg-yellow-950/20 border-yellow-500/30'}`}>
+        <div className="max-w-2xl">
+          <div className={`flex items-center gap-2 font-bold tracking-widest text-xs md:text-sm mb-2 ${analysisData.strandedYear < 2050 ? 'text-red-400' : 'text-yellow-400'}`}>
+            <Hourglass className="w-5 h-5 animate-pulse" />
+            STRANDED ASSET COUNTDOWN
           </div>
-        );
-      })}
-    </div>
+          <p className="text-gray-300 text-xs md:text-sm leading-relaxed">
+            Based on current compounding physical risks and regulatory transition penalties (CRREM pathways), this asset is projected to become uninsurable, unsellable, or commercially obsolete by this year without immediate deep retrofitting.
+          </p>
+        </div>
+        <div className={`text-6xl md:text-7xl font-black tracking-tighter ${analysisData.strandedYear < 2050 ? 'text-red-500' : 'text-yellow-500'}`}>
+          {analysisData.strandedYear}
+        </div>
+      </div>
+
+      {/* KPI CARDS GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+        <div className="bg-[#131B2E]/50 backdrop-blur-md border border-white/10 p-4 rounded-xl">
+          <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
+            <ShieldAlert className="w-3 h-3 text-cyan-400" /> Overall Risk Score
+          </div>
+          <div className="text-2xl font-bold text-cyan-400">{analysisData.overallScore}/100</div>
+          <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">
+            {analysisData.riskLevel} — Monitor periodically
+          </div>
+        </div>
+
+        <div className="bg-[#131B2E]/50 backdrop-blur-md border border-white/10 p-4 rounded-xl">
+          <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
+            <TrendingDown className="w-3 h-3 text-red-400" /> Value Loss by 2065
+          </div>
+          <div className="text-2xl font-bold text-red-400">${valueLoss.toLocaleString()}</div>
+          <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">Based on live geospatial analysis</div>
+        </div>
+
+        <div className="bg-[#131B2E]/50 backdrop-blur-md border border-white/10 p-4 rounded-xl">
+          <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
+            <ShieldCheck className="w-3 h-3 text-emerald-400" /> Adaptation Budget
+          </div>
+          <div className="text-2xl font-bold text-emerald-400">${adaptationBudget.toLocaleString()}</div>
+          <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">To reduce risk score to &lt; 45</div>
+        </div>
+
+        <div className="bg-[#131B2E]/50 backdrop-blur-md border border-white/10 p-4 rounded-xl">
+          <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
+            <FileText className="w-3 h-3 text-orange-400" /> Insurance Premium
+          </div>
+          <div className="text-2xl font-bold text-orange-400">+34% by 2035</div>
+          <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">Based on trajectory</div>
+        </div>
+
+        {/* NEW: ROI CARD */}
+        <div className="bg-[#131B2E]/50 backdrop-blur-md border border-white/10 p-4 rounded-xl">
+          <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
+            <TrendingUp className="w-3 h-3 text-emerald-400" /> Adaptation ROI
+          </div>
+          <div className="text-2xl font-bold text-emerald-400">+{analysisData.adaptationROI}%</div>
+          <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">Return on resilience spend</div>
+        </div>
+
+        {/* NEW: GREEN PREMIUM CARD */}
+        <div className="bg-[#131B2E]/50 backdrop-blur-md border border-white/10 p-4 rounded-xl">
+          <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
+            <Zap className="w-3 h-3 text-cyan-400" /> Green Premium
+          </div>
+          <div className="text-2xl font-bold text-cyan-400">+{analysisData.greenPremiumPercent}%</div>
+          <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">Market value uplift</div>
+        </div>
+      </div>
+    </> /* THIS IS THE MISSING CLOSING TAG YOU NEEDED! */
   );
 };
 

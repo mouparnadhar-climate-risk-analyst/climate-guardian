@@ -1,4 +1,3 @@
-// Final deployment check
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { TrendingDown } from "lucide-react";
@@ -18,8 +17,7 @@ function riskLabel(pct: number): { risk: string; color: string } {
   if (pct <= 0.15) return { risk: "LOW-MEDIUM", color: "bg-yellow-500" };
   if (pct <= 0.30) return { risk: "MEDIUM", color: "bg-orange-500" };
   if (pct <= 0.50) return { risk: "HIGH", color: "bg-red-500" };
-  if (pct <= 0.70) return { risk: "VERY HIGH", color: "bg-red-800" };
-  return { risk: "EXTREME", color: "bg-purple-950" };
+  return { risk: "VERY HIGH", color: "bg-red-800" };
 }
 
 interface FinancialRiskSectionProps {
@@ -36,19 +34,20 @@ const FinancialRiskSection = ({ assetValue, lossPerDecade }: FinancialRiskSectio
   const rate = lossPerDecade ?? 0.10; // default ~10% if no analysis run
   const adaptRate = rate * 0.35; // adaptation reduces loss by 65%
 
+  // ✅ UPDATED: The loop now goes to 2085
   const rows = useMemo(() => {
     const decades = [
-      { year: 2025, scenario: "Baseline", decadesOut: 0, accel: 1 },
-      { year: 2035, scenario: "RCP 4.5", decadesOut: 1, accel: 1 },
-      { year: 2045, scenario: "RCP 4.5", decadesOut: 2, accel: 1 },
-      { year: 2055, scenario: "RCP 8.5", decadesOut: 3, accel: 1 },
-      { year: 2065, scenario: "RCP 8.5", decadesOut: 4, accel: 1 },
-      { year: 2075, scenario: "RCP 8.5", decadesOut: 5, accel: 1.4 },
-      { year: 2085, scenario: "RCP 8.5", decadesOut: 6, accel: 1.4 * 1.35 },
+      { year: 2025, scenario: "Baseline", decadesOut: 0 },
+      { year: 2035, scenario: "RCP 4.5", decadesOut: 1 },
+      { year: 2045, scenario: "RCP 4.5", decadesOut: 2 },
+      { year: 2055, scenario: "RCP 8.5", decadesOut: 3 },
+      { year: 2065, scenario: "RCP 8.5", decadesOut: 4 },
+      { year: 2075, scenario: "RCP 8.5", decadesOut: 5 }, // Added year
+      { year: 2085, scenario: "RCP 8.5", decadesOut: 6 }, // Added year
     ];
     return decades.map((d) => {
-      const baseLoss = 1 - Math.pow(1 - rate, d.decadesOut);
-      const pct = Math.min(baseLoss * d.accel, 0.99);
+      const cumulativeLoss = 1 - Math.pow(1 - rate, d.decadesOut);
+      const pct = Math.min(cumulativeLoss, 0.99);
       const projected = baseValue * (1 - pct);
       const loss = baseValue * pct;
       const { risk, color } = riskLabel(pct);
@@ -56,12 +55,12 @@ const FinancialRiskSection = ({ assetValue, lossPerDecade }: FinancialRiskSectio
     });
   }, [baseValue, rate]);
 
+  // ✅ UPDATED: The chart data now extends to 2085
   const chartData = useMemo(() => {
-    const accels = [1, 1, 1, 1, 1, 1.4, 1.4 * 1.35];
-    return [0, 1, 2, 3, 4, 5, 6].map((i) => {
+    return [0, 1, 2, 3, 4, 5, 6].map((i) => { // Loop from 0 to 6
       const year = 2025 + i * 10;
-      const bauLoss = (1 - Math.pow(1 - rate, i)) * accels[i];
-      const adaptLoss = (1 - Math.pow(1 - adaptRate, i)) * accels[i];
+      const bauLoss = 1 - Math.pow(1 - rate, i);
+      const adaptLoss = 1 - Math.pow(1 - adaptRate, i);
       return {
         year,
         bau: baseValue * (1 - Math.min(bauLoss, 0.99)),
@@ -79,17 +78,18 @@ const FinancialRiskSection = ({ assetValue, lossPerDecade }: FinancialRiskSectio
       className="mt-10"
     >
       <div className="flex items-center gap-3 mb-6">
-        <TrendingDown className="h-6 w-6 text-primary" />
-        <h2 className="text-xl md:text-2xl font-bold text-foreground">
-          Financial Risk Projection{" "}
-          <span className="text-muted-foreground font-normal text-base">(10-Year Intervals)</span>
-        </h2>
-        {lossPerDecade != null && (
-          <span className="ml-auto text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
-            Loss rate: {(rate * 100).toFixed(0)}%/decade (data-driven)
-          </span>
-        )}
-      </div>
+  <TrendingDown className="h-6 w-6 text-primary" />
+  <h2 className="text-xl md:text-2xl font-bold text-foreground">
+    Financial Risk Projection{" "}
+    <span className="text-muted-foreground font-normal text-base">(10-Year Intervals)</span>
+  </h2>
+  {/* ✅ THIS IS THE FIXED LINE */}
+  {lossPerDecade != null && (
+    <span className="ml-auto text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
+      Loss rate: {(rate * 100).toFixed(0)}%/decade (data-driven)
+    </span>
+  )}
+</div>
 
       {/* Table */}
       <div className="rounded-lg border border-border bg-card/60 backdrop-blur-md overflow-x-auto">

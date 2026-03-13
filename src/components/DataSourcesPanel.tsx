@@ -15,7 +15,7 @@ const DataSourcesPanel = ({ data }: DataSourcesPanelProps) => {
     },
     {
       name: `Elevation — ${data.elevation.source}`,
-      url: "https://open-meteo.com",
+      url: "https://api.open-elevation.com",
       raw: `elevation: ${data.elevation.elevation}m → severity: ${data.elevation.severity} (score: ${data.elevation.score})`,
     },
     {

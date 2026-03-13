@@ -3,54 +3,48 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
 import { Shield, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-const propertyTypes = ["Commercial Office", "Residential", "Residential Villa", "Industrial", "Retail", "Mixed Use", "Data Center", "Warehouse"];
+const propertyTypes =["Commercial Office", "Residential", "Residential Villa", "Industrial", "Retail", "Mixed Use", "Data Center", "Warehouse"];
 
-const countries = [
-  "Albania", "Argentina", "Australia", "Austria",
-  "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belgium", "Brazil", "Bulgaria",
-  "Cambodia", "Canada", "Chile", "China", "Colombia", "Croatia", "Cyprus", "Czech Republic",
-  "Denmark", "Dominican Republic",
-  "Egypt", "Estonia",
+// 🌍 ALL COUNTRIES IN THE WORLD
+const countries =[
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
+  "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
+  "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)",
+  "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic",
+  "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia",
   "Fiji", "Finland", "France",
-  "Germany", "Greece",
-  "Hong Kong", "Hungary",
-  "Iceland", "India", "Indonesia", "Ireland", "Israel", "Italy",
+  "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
+  "Haiti", "Honduras", "Hungary",
+  "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy",
   "Jamaica", "Japan", "Jordan",
-  "Kenya", "Kuwait",
-  "Latvia", "Lebanon", "Lithuania", "Luxembourg",
-  "Malaysia", "Maldives", "Malta", "Mauritius", "Mexico", "Monaco", "Morocco",
-  "Nepal", "Netherlands", "New Zealand", "Nigeria", "Norway",
+  "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
+  "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+  "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (Burma)",
+  "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway",
   "Oman",
-  "Pakistan", "Philippines", "Poland", "Portugal",
+  "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
   "Qatar",
-  "Romania", "Russia",
-  "Saudi Arabia", "Seychelles", "Singapore", "Slovakia", "Slovenia", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sweden", "Switzerland",
-  "Taiwan", "Thailand", "Turkey",
-  "UAE", "UK", "Ukraine", "USA",
-  "Vanuatu", "Vietnam",
+  "Romania", "Russia", "Rwanda",
+  "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
+  "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
+  "Uganda", "Ukraine", "United Arab Emirates (UAE)", "United Kingdom (UK)", "United States of America (USA)", "Uruguay", "Uzbekistan",
+  "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
+  "Yemen",
+  "Zambia", "Zimbabwe"
 ];
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 125 }, (_, i) => String(currentYear - i));
-
-export interface ResilienceChecks {
-  floodBarriers: boolean;
-  seismicRetrofit: boolean;
-  heatReflective: boolean;
-}
 
 export interface AssetFormState {
   propertyName: string;
   propertyType: string;
   constructionYear: string;
   country: string;
-  resilience: ResilienceChecks;
 }
 
 interface AssetDetailsPanelProps {
@@ -62,7 +56,7 @@ interface AssetDetailsPanelProps {
   onFormStateChange: (state: AssetFormState) => void;
 }
 
-const DEFAULT_FORM: AssetFormState = { propertyName: "", propertyType: "", constructionYear: "", country: "", resilience: { floodBarriers: false, seismicRetrofit: false, heatReflective: false } };
+const DEFAULT_FORM: AssetFormState = { propertyName: "", propertyType: "", constructionYear: "", country: "" };
 
 const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyzing, formState = DEFAULT_FORM, onFormStateChange }: AssetDetailsPanelProps) => {
   const update = (patch: Partial<AssetFormState>) => onFormStateChange?.({ ...formState, ...patch });
@@ -76,7 +70,7 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyz
   };
 
   return (
-    <motion.div id="asset-details-panel"
+    <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
@@ -142,7 +136,7 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyz
             <SelectTrigger className="bg-secondary border-border text-foreground h-11 md:h-10">
               <SelectValue placeholder="Select country" />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border">
+            <SelectContent className="bg-card border-border max-h-60">
               {countries.map((c) => (
                 <SelectItem key={c} value={c}>{c}</SelectItem>
               ))}
@@ -150,44 +144,29 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyz
           </Select>
         </div>
 
-        <Accordion type="single" collapsible className="border border-border rounded-lg">
-          <AccordionItem value="resilience" className="border-none">
-            <AccordionTrigger className="px-3 py-2.5 text-xs md:text-sm text-muted-foreground hover:no-underline">
-              Building Structural Details (Optional)
-            </AccordionTrigger>
-            <AccordionContent className="px-3 space-y-3">
-              <label className="flex items-start gap-2.5 cursor-pointer">
-                <Checkbox
-                  checked={formState.resilience?.floodBarriers ?? false}
-                  onCheckedChange={(v) => update({ resilience: { ...formState.resilience, floodBarriers: !!v } })}
-                  className="mt-0.5"
-                />
-                <span className="text-xs text-foreground">Flood Barriers / Elevated Utilities installed?</span>
-              </label>
-              <label className="flex items-start gap-2.5 cursor-pointer">
-                <Checkbox
-                  checked={formState.resilience?.seismicRetrofit ?? false}
-                  onCheckedChange={(v) => update({ resilience: { ...formState.resilience, seismicRetrofit: !!v } })}
-                  className="mt-0.5"
-                />
-                <span className="text-xs text-foreground">Seismic Retrofitting (Dampers/Bracing)?</span>
-              </label>
-              <label className="flex items-start gap-2.5 cursor-pointer">
-                <Checkbox
-                  checked={formState.resilience?.heatReflective ?? false}
-                  onCheckedChange={(v) => update({ resilience: { ...formState.resilience, heatReflective: !!v } })}
-                  className="mt-0.5"
-                />
-                <span className="text-xs text-foreground">Heat-Reflective Glass / Cool Roof?</span>
-              </label>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        {/* RE-ADDED: BUILDING STRUCTURAL DETAILS */}
+        <div className="pt-4 border-t border-white/10">
+          <p className="text-xs font-semibold text-cyan-400 mb-3 uppercase tracking-wider">Building Structural Details (Optional)</p>
+          <div className="space-y-3">
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" className="form-checkbox h-4 w-4 text-cyan-500 rounded border-gray-600 bg-[#0A0F1E] focus:ring-cyan-500 focus:ring-offset-gray-900 transition-colors" />
+              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">Flood Barriers / Elevated Utilities</span>
+            </label>
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" className="form-checkbox h-4 w-4 text-cyan-500 rounded border-gray-600 bg-[#0A0F1E] focus:ring-cyan-500 focus:ring-offset-gray-900 transition-colors" />
+              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">Seismic Retrofitting (Dampers)</span>
+            </label>
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <input type="checkbox" className="form-checkbox h-4 w-4 text-cyan-500 rounded border-gray-600 bg-[#0A0F1E] focus:ring-cyan-500 focus:ring-offset-gray-900 transition-colors" />
+              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">Heat-Reflective Glass / Cool Roof</span>
+            </label>
+          </div>
+        </div>
 
         <Button
           onClick={handleAnalyze}
           disabled={isAnalyzing}
-          className="w-full mt-2 bg-primary text-primary-foreground hover:bg-primary/90 glow-primary font-semibold text-sm md:text-base h-12 transition-all hover:glow-primary-intense"
+          className="w-full mt-4 bg-primary text-primary-foreground hover:bg-primary/90 glow-primary font-semibold text-sm md:text-base h-12 transition-all hover:glow-primary-intense"
         >
           {isAnalyzing ? (
             <>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Wand2, Download, History, Trash2 } from "lucide-react";
@@ -30,6 +30,11 @@ const Navbar = ({ onDemo, onHistorySelect }: NavbarProps) => {
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
 
+  // FIX: This forces the Navbar to load your past searches immediately
+  useEffect(() => {
+    refreshHistory();
+  },[]);
+
   const refreshHistory = () => setHistory(getHistory());
 
   const handleClear = () => {
@@ -39,16 +44,17 @@ const Navbar = ({ onDemo, onHistorySelect }: NavbarProps) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-      {/* FIXED: Changed h-14 to min-h-[3.5rem] and added py-2 to allow expanding on mobile */}
       <div className="container flex min-h-[3.5rem] md:min-h-[4rem] py-2 md:py-0 items-center justify-between flex-wrap gap-y-2">
         
+        {/* FIX: Centered Logo on mobile, left aligned on desktop */}
         <div className="flex items-center justify-center w-full md:w-auto md:justify-start gap-2 md:gap-3 shrink-0">
           <VaultLogo />
           <span className="text-base md:text-lg font-bold tracking-wider text-foreground">CLIMATEVAULT</span>
         </div>
 
-        {/* FIXED: Added flex-wrap and justify-end here */}
+        {/* FIX: Centered Buttons on mobile, right aligned on desktop */}
         <div className="flex flex-wrap justify-center w-full md:w-auto md:justify-end items-center gap-1.5 md:gap-2">
+          
           <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (v) refreshHistory(); }}>
             <SheetTrigger asChild>
               <Button
