@@ -1,4 +1,4 @@
-import { Waves, ThermometerSun, CloudRain, Activity, Wind, Navigation, Unplug, Gavel } from "lucide-react";
+import { Waves, ThermometerSun, CloudRain, Activity, Wind, Navigation, Unplug, Gavel, Droplets, HeartPulse } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { AnalysisResult } from "@/services/apiService";
 
@@ -146,13 +146,42 @@ const RiskFactors = ({ data }: RiskFactorsProps) => {
             Peak wind speeds of <strong>{data.climate.maxWindSpeed} km/h</strong> detected. High velocity winds threaten structural integrity and increase debris impact risk.
           </p>
           <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-blue-400 transition-all duration-1000" 
+            <div
+              className="h-full bg-blue-400 transition-all duration-1000"
               style={{ width: `${data.climate.maxWindSpeed > 150 ? 100 : (data.climate.maxWindSpeed / 150) * 100}%` }}
             ></div>
           </div>
+        </div>
 
-          {/* NEW: Infrastructure Island Effect Card */}
+        {/* 7. NEW: Water Scarcity & Aridity */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-sky-500/10 rounded-lg">
+              <Droplets className="w-6 h-6 text-sky-400" />
+            </div>
+            <Badge
+              variant="outline"
+              className={`${data.climate.status === 'LIVE' ? 'bg-emerald-900/20 text-emerald-400' : 'bg-yellow-900/20 text-yellow-400'} border-none text-[10px]`}
+            >
+              {data.climate.status === 'LIVE' ? '🟢 LIVE DATA' : '🟡 ESTIMATED'}
+            </Badge>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">
+            Water Scarcity &amp; Aridity — {data.climate.waterStressSeverity}
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+            Last 90 days precipitation: <strong>{data.climate.totalPrecipitation}mm</strong>. Persistent heat of{" "}
+            <strong>{data.climate.avgMaxTemp}°C</strong> combined with low rainfall signals chronic water stress risk.
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-sky-400 transition-all duration-1000"
+              style={{ width: `${data.climate.waterStressScore}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* 8. NEW: Infrastructure Island Effect Card */}
         <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group hover:border-white/20 transition-all">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-pink-500/10 rounded-lg">
@@ -176,7 +205,36 @@ const RiskFactors = ({ data }: RiskFactorsProps) => {
           </div>
         </div>
 
-        {/* NEW: Regulatory Transition Risk Card (Local Law 97) */}
+        {/* 9. NEW: Social Resilience & Recovery */}
+        <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group hover:border-white/20 transition-all">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-emerald-500/10 rounded-lg">
+              <HeartPulse className="w-6 h-6 text-emerald-400" />
+            </div>
+            <Badge
+              variant="outline"
+              className={`${data.infrastructure.status === 'LIVE' ? 'bg-emerald-900/20 text-emerald-400' : 'bg-yellow-900/20 text-yellow-400'} border-none text-[10px]`}
+            >
+              {data.infrastructure.status === 'LIVE' ? '🟢 LIVE DATA' : '🟡 ESTIMATED'}
+            </Badge>
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">
+            Social Resilience &amp; Recovery
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+            Neighborhood recovery speed estimated at{" "}
+            <strong>{data.infrastructure.neighborhoodRecoverySpeed}%</strong>. Dense networks of hospitals, schools,
+            and public transport shorten downtime after major shocks.
+          </p>
+          <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-emerald-400"
+              style={{ width: `${data.infrastructure.neighborhoodRecoverySpeed}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* 10. NEW: Regulatory Transition Risk Card (Local Law 97) */}
         <div className="bg-[#131B2E]/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group hover:border-white/20 transition-all">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-emerald-500/10 rounded-lg">
@@ -197,7 +255,6 @@ const RiskFactors = ({ data }: RiskFactorsProps) => {
           <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
             <div className="h-full bg-emerald-400" style={{ width: `${data.carbonFine > 0 ? 80 : 10}%` }}></div>
           </div>
-        </div>
         </div>
 
       </div>

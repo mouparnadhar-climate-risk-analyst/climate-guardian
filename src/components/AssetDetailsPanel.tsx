@@ -45,6 +45,8 @@ export interface AssetFormState {
   propertyType: string;
   constructionYear: string;
   country: string;
+  energyUsage?: string;
+  fuelSource?: string;
 }
 
 interface AssetDetailsPanelProps {
@@ -142,6 +144,42 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyz
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {/* ENVIRONMENTAL IMPACT DATA (DOUBLE MATERIALITY) */}
+        <div className="pt-4 border-t border-white/10">
+          <p className="text-xs font-semibold text-emerald-400 mb-3 uppercase tracking-wider">
+            Environmental Impact Data (Optional)
+          </p>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-muted-foreground text-xs md:text-sm">Annual Energy Usage (kWh)</Label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="e.g. 2,500,000"
+                value={formState.energyUsage ?? ""}
+                onChange={(e) => update({ energyUsage: e.target.value })}
+                className="bg-secondary border-border text-foreground placeholder:text-muted-foreground h-11 md:h-10"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-muted-foreground text-xs md:text-sm">Primary Fuel Source</Label>
+              <Select
+                value={formState.fuelSource ?? ""}
+                onValueChange={(v) => update({ fuelSource: v })}
+              >
+                <SelectTrigger className="bg-secondary border-border text-foreground h-11 md:h-10">
+                  <SelectValue placeholder="Select fuel source" />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="Grid Mix">Grid Mix</SelectItem>
+                  <SelectItem value="Natural Gas">Natural Gas</SelectItem>
+                  <SelectItem value="100% Renewable">100% Renewable</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
         {/* RE-ADDED: BUILDING STRUCTURAL DETAILS */}

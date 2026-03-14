@@ -5,6 +5,7 @@ import KpiSummary from "@/components/KpiSummary";
 import AssetDetailsPanel, { type AssetFormState } from "@/components/AssetDetailsPanel";
 import RiskMap from "@/components/RiskMap";
 import FinancialRiskSection from "@/components/FinancialRiskSection";
+import MaterialityMatrix from "@/components/MaterialityMatrix";
 import RiskFactors from "@/components/RiskFactors";
 import DataSourcesPanel from "@/components/DataSourcesPanel";
 import ExportButton from "@/components/ExportButton";
@@ -36,9 +37,17 @@ const Index = () => {
     setIsAnalyzing(true);
     setLoadingStep(-1);
 
-    const result = await runFullAnalysis(address, assetValue, formState.propertyType, formState.constructionYear, (step) => {
-  setLoadingStep(step);
-});
+    const result = await runFullAnalysis(
+      address,
+      assetValue,
+      formState.propertyType,
+      formState.constructionYear,
+      formState.energyUsage,
+      formState.fuelSource,
+      (step) => {
+        setLoadingStep(step);
+      }
+    );
 
     setAnalysisLocation({ lat: result.location.lat, lng: result.location.lng });
     setAnalysisData(result);
@@ -66,7 +75,7 @@ const Index = () => {
     setTimeout(() => {
       document.getElementById("kpi-summary")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 300);
-  }, [assetValue]);
+  }, [assetValue, formState.propertyType, formState.constructionYear, formState.energyUsage, formState.fuelSource]);
 
   const handleRetry = () => {
     if (lastAddress.current) {
@@ -132,6 +141,13 @@ const Index = () => {
         </div>
         
         <FinancialRiskSection assetValue={assetValue} lossPerDecade={analysisData?.lossPerDecade} />
+
+        {analysisData && (
+          <MaterialityMatrix
+            impactScore={analysisData.impactScore}
+            riskScore={analysisData.overallScore}
+          />
+        )}
         
         {analysisData ? (
           <RiskFactors data={analysisData} />

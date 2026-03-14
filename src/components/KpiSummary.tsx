@@ -1,4 +1,4 @@
-import { ShieldAlert, TrendingDown, ShieldCheck, FileText, Zap, TrendingUp, Hourglass } from "lucide-react";
+import { ShieldAlert, TrendingDown, ShieldCheck, FileText, Zap, TrendingUp, Hourglass, Globe2, SunMedium } from "lucide-react";
 import type { AnalysisResult } from "@/services/apiService";
 
 interface KpiSummaryProps {
@@ -34,7 +34,7 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
       </div>
 
       {/* KPI CARDS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4 mb-6">
         <div className="bg-[#131B2E]/50 backdrop-blur-md border border-white/10 p-4 rounded-xl">
           <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
             <ShieldAlert className="w-3 h-3 text-cyan-400" /> Overall Risk Score
@@ -85,6 +85,34 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
           </div>
           <div className="text-2xl font-bold text-cyan-400">+{analysisData.greenPremiumPercent}%</div>
           <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">Market value uplift</div>
+        </div>
+
+        {/* NEW: DOUBLE MATERIALITY IMPACT CARD */}
+        <div className="bg-[#131B2E]/50 backdrop-blur-md border border-white/10 p-4 rounded-xl">
+          <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
+            <Globe2 className="w-3 h-3 text-cyan-300" /> Impact Materiality (CO2e)
+          </div>
+          <div className="text-2xl font-bold text-cyan-300">{analysisData.impactScore}/100</div>
+          <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">
+            Building-on-Planet Impact
+          </div>
+        </div>
+
+        {/* NEW: SOLAR YIELD OPPORTUNITY CARD */}
+        <div className="bg-[#131B2E]/50 backdrop-blur-md border border-white/10 p-4 rounded-xl relative overflow-hidden">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
+              <SunMedium className="w-3 h-3 text-amber-300" /> Solar Yield Potential
+            </div>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-900/30 text-emerald-400 font-semibold">
+              🟢 LIVE DATA
+            </span>
+          </div>
+          <div className="text-2xl font-bold text-amber-300">
+            {analysisData.solarPotential}%</div>
+          <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">
+            Asset Adaptation Opportunity
+          </div>
         </div>
       </div>
     </> /* THIS IS THE MISSING CLOSING TAG YOU NEEDED! */
