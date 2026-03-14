@@ -73,6 +73,8 @@ cd climate-guardian
 **👩‍💻Author**
 
 **Mouparna Dhar**
-Climate & Geospatial Risk Analyst | AI-Accelerated Full-Stack Developer
+
+Climate & Geospatial Risk Analyst | AI-Accelerated Full-Stack Developer\
+
 Bridging the gap between environmental science and global capital markets.
 Built during the She Builds Global Hackathon.
