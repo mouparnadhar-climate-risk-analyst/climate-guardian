@@ -5,6 +5,9 @@ import { Wand2, Download, History, Trash2 } from "lucide-react";
 import { usePwaInstall } from "@/hooks/usePwaInstall";
 import { getHistory, clearHistory, type HistoryEntry } from "@/services/historyService";
 import { Badge } from "@/components/ui/badge";
+import AuthModal from "@/components/AuthModal";
+import { supabase } from "@/lib/supabase";
+import type { Session } from "@supabase/supabase-js";
 
 const VaultLogo = () => (
   <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,11 +32,31 @@ const Navbar = ({ onDemo, onHistorySelect }: NavbarProps) => {
   const { canInstall, install } = usePwaInstall();
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [session, setSession] = useState<Session | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
 
   // FIX: This forces the Navbar to load your past searches immediately
   useEffect(() => {
     refreshHistory();
   },[]);
+
+  // Supabase auth session tracking
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setSession(data.session ?? null);
+    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const refreshHistory = () => setHistory(getHistory());
 
@@ -124,8 +147,33 @@ const Navbar = ({ onDemo, onHistorySelect }: NavbarProps) => {
             <Wand2 className="h-3.5 w-3.5 mr-1" />
             Demo Mode
           </Button>
+
+          {/* Auth controls */}
+          {session ? (
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] md:text-xs text-muted-foreground max-w-[150px] md:max-w-[220px] truncate">
+                {session.user.email}
+              </span>
+              <Button
+                variant="outline"
+                className="border-border text-muted-foreground hover:bg-secondary hover:text-foreground transition-all text-[11px] md:text-sm h-8 md:h-9 px-2 md:px-3"
+                onClick={() => supabase.auth.signOut()}
+              >
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              className="border-border text-muted-foreground hover:bg-secondary hover:text-foreground transition-all text-[11px] md:text-sm h-8 md:h-9 px-2 md:px-4"
+              onClick={() => setAuthOpen(true)}
+            >
+              Sign In
+            </Button>
+          )}
         </div>
       </div>
+      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
     </nav>
   );
 };

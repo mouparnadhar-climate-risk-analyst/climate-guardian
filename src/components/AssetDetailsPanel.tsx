@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { motion } from "framer-motion";
 import { Shield, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import BulkUploadZone, { type BulkUploadRecord } from "@/components/BulkUploadZone";
 
 const propertyTypes =["Commercial Office", "Residential", "Residential Villa", "Industrial", "Retail", "Mixed Use", "Data Center", "Warehouse"];
 
@@ -56,11 +57,32 @@ interface AssetDetailsPanelProps {
   isAnalyzing?: boolean;
   formState: AssetFormState;
   onFormStateChange: (state: AssetFormState) => void;
+  mode: "single" | "bulk";
+  onModeChange: (mode: "single" | "bulk") => void;
+  onBulkRecordsParsed: (records: BulkUploadRecord[]) => void;
+  bulkProgress?: string | null;
+  bulkProgressPercent?: number;
+  bulkRunning?: boolean;
+  onStartBulkAnalysis?: () => void;
 }
 
 const DEFAULT_FORM: AssetFormState = { propertyName: "", propertyType: "", constructionYear: "", country: "" };
 
-const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyzing, formState = DEFAULT_FORM, onFormStateChange }: AssetDetailsPanelProps) => {
+const AssetDetailsPanel = ({
+  onAnalyze,
+  assetValue,
+  onAssetValueChange,
+  isAnalyzing,
+  formState = DEFAULT_FORM,
+  onFormStateChange,
+  mode,
+  onModeChange,
+  onBulkRecordsParsed,
+  bulkProgress,
+  bulkProgressPercent,
+  bulkRunning,
+  onStartBulkAnalysis,
+}: AssetDetailsPanelProps) => {
   const update = (patch: Partial<AssetFormState>) => onFormStateChange?.({ ...formState, ...patch });
 
   const handleAnalyze = () => {
@@ -78,13 +100,33 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyz
       transition={{ duration: 0.5, delay: 0.3 }}
       className="rounded-lg border border-border bg-card p-4 md:p-6 space-y-4 md:space-y-5"
     >
-      <div className="flex items-center gap-2 mb-2">
-        <Shield className="h-5 w-5 text-primary" />
-        <h2 className="text-base md:text-lg font-semibold text-foreground">Asset Details</h2>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-primary" />
+          <h2 className="text-base md:text-lg font-semibold text-foreground">Asset Details</h2>
+        </div>
+        <div className="inline-flex items-center rounded-full bg-muted p-1 text-xs">
+          <button
+            type="button"
+            onClick={() => onModeChange("single")}
+            className={`px-3 py-1 rounded-full transition-colors ${mode === "single" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+          >
+            Single Asset
+          </button>
+          <button
+            type="button"
+            onClick={() => onModeChange("bulk")}
+            className={`px-3 py-1 rounded-full transition-colors ${mode === "bulk" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+          >
+            Bulk Upload (Enterprise)
+          </button>
+        </div>
       </div>
 
       <div className="space-y-3 md:space-y-4">
-        <div className="space-y-1.5">
+        {mode === "single" && (
+        <>
+          <div className="space-y-1.5">
           <Label className="text-muted-foreground text-xs md:text-sm">Property Name / Address</Label>
           <Input
             placeholder="e.g. Manhattan Tower A or 123 Main St, NYC"
@@ -215,6 +257,40 @@ const AssetDetailsPanel = ({ onAnalyze, assetValue, onAssetValueChange, isAnalyz
             "Run Climate Risk Analysis"
           )}
         </Button>
+        </>
+        )}
+
+        {mode === "bulk" && (
+          <div className="space-y-4">
+            <BulkUploadZone disabled={bulkRunning} onRecordsParsed={onBulkRecordsParsed} />
+            {bulkProgress && (
+              <p className="text-[11px] text-muted-foreground">{bulkProgress}</p>
+            )}
+            {typeof bulkProgressPercent === "number" && (
+              <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${Math.min(100, Math.max(0, bulkProgressPercent))}%` }}
+                />
+              </div>
+            )}
+            <Button
+              type="button"
+              onClick={onStartBulkAnalysis}
+              disabled={bulkRunning}
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 glow-primary font-semibold text-sm md:text-base h-11"
+            >
+              {bulkRunning ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Running Enterprise Bulk Analysis...
+                </>
+              ) : (
+                "Run Bulk Analysis for All Properties"
+              )}
+            </Button>
+          </div>
+        )}
       </div>
     </motion.div>
   );

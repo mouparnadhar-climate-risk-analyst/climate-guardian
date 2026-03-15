@@ -1,3 +1,10 @@
+/* ==========================================================================
+ * © 2026 Mou Parna Dhar. All Rights Reserved.
+ * Project: ClimateVault - Institutional ESG & Climate Risk Intelligence
+ * Architect: Mou Parna Dhar
+ * Description: Core multi-API orchestration and financial risk algorithms.
+ * ========================================================================== */
+
 // ClimateVault API Service — Advanced ESG Analytics
 
 export interface GeoLocation { lat: number; lng: number; displayName: string; status: DataStatus; }
