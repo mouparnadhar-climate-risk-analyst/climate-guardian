@@ -15,7 +15,9 @@ import EstimatedWarningCard from "@/components/EstimatedWarningCard";
 import MobileStickyBar from "@/components/MobileStickyBar";
 import Footer from "@/components/Footer";
 import DisasterScenarios from "@/components/DisasterScenarios";
+import LiveIntelFeed from "@/components/LiveIntelFeed";
 import { runFullAnalysis, type AnalysisResult } from "@/services/apiService";
+import { fetchLocalClimateNews } from "@/services/newsService";
 
 const INITIAL_FORM: AssetFormState = {
   propertyName: "",
@@ -28,6 +30,7 @@ const Index = () => {
   const [analysisLocation, setAnalysisLocation] = useState<{ lat: number; lng: number } | null>(null);
   const[assetValue, setAssetValue] = useState("");
   const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
+  const [news, setNews] = useState<any[]>([]);
   const [loadingStep, setLoadingStep] = useState(-1);
   const[isAnalyzing, setIsAnalyzing] = useState(false);
   const [formState, setFormState] = useState<AssetFormState>(INITIAL_FORM);
@@ -60,6 +63,10 @@ const Index = () => {
 
     setAnalysisLocation({ lat: result.location.lat, lng: result.location.lng });
     setAnalysisData(result);
+    setNews([]);
+
+    const fetchedNews = await fetchLocalClimateNews(result.location.displayName);
+    setNews(fetchedNews);
     setIsAnalyzing(false);
 
     // Save to LocalStorage so the History Button works
@@ -192,7 +199,7 @@ const Index = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `ClimateVault_BulkResults_${Date.now()}.csv`);
+    link.setAttribute("download", `TerraQuant_BulkResults_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -248,21 +255,28 @@ const Index = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6 mt-6">
           <div className="lg:col-span-2">
-            <AssetDetailsPanel
-              onAnalyze={handleAnalyze}
-              assetValue={assetValue}
-              onAssetValueChange={setAssetValue}
-              isAnalyzing={isAnalyzing}
-              formState={formState}
-              onFormStateChange={setFormState}
-              mode={mode}
-              onModeChange={setMode}
-              onBulkRecordsParsed={handleBulkRecordsParsed}
-              bulkProgress={bulkProgress}
-              bulkProgressPercent={bulkProgressPercent}
-              bulkRunning={bulkRunning}
-              onStartBulkAnalysis={handleBulkAnalysis}
-            />
+            <div className="flex flex-col gap-4">
+              <AssetDetailsPanel
+                onAnalyze={handleAnalyze}
+                assetValue={assetValue}
+                onAssetValueChange={setAssetValue}
+                isAnalyzing={isAnalyzing}
+                formState={formState}
+                onFormStateChange={setFormState}
+                mode={mode}
+                onModeChange={setMode}
+                onBulkRecordsParsed={handleBulkRecordsParsed}
+                bulkProgress={bulkProgress}
+                bulkProgressPercent={bulkProgressPercent}
+                bulkRunning={bulkRunning}
+                onStartBulkAnalysis={handleBulkAnalysis}
+              />
+
+              <LiveIntelFeed
+                news={news}
+                location={analysisData?.location.displayName ?? ""}
+              />
+            </div>
           </div>
           <div className="lg:col-span-3">
             <RiskMap analysisLocation={analysisLocation} />

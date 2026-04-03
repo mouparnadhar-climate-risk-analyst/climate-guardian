@@ -28,7 +28,7 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
             Based on current compounding physical risks and regulatory transition penalties (CRREM pathways), this asset is projected to become uninsurable, unsellable, or commercially obsolete by this year without immediate deep retrofitting.
           </p>
         </div>
-        <div className={`text-6xl md:text-7xl font-black tracking-tighter ${analysisData.strandedYear < 2050 ? 'text-red-500' : 'text-yellow-500'}`}>
+        <div className={`text-6xl md:text-7xl font-black tracking-tighter font-orbitron tabular-nums ${analysisData.strandedYear < 2050 ? 'text-red-500' : 'text-yellow-500'}`}>
           {analysisData.strandedYear}
         </div>
       </div>
@@ -39,7 +39,7 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
           <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
             <ShieldAlert className="w-3 h-3 text-cyan-400" /> Overall Risk Score
           </div>
-          <div className="text-2xl font-bold text-cyan-400">{analysisData.overallScore}/100</div>
+          <div className="text-2xl font-bold text-cyan-400 font-orbitron tabular-nums">{analysisData.overallScore}/100</div>
           <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">
             {analysisData.riskLevel} — Monitor periodically
           </div>
@@ -49,7 +49,7 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
           <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
             <TrendingDown className="w-3 h-3 text-red-400" /> Value Loss by 2065
           </div>
-          <div className="text-2xl font-bold text-red-400">${valueLoss.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-red-400 font-orbitron tabular-nums">${valueLoss.toLocaleString()}</div>
           <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">Based on live geospatial analysis</div>
         </div>
 
@@ -57,7 +57,7 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
           <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
             <ShieldCheck className="w-3 h-3 text-emerald-400" /> Adaptation Budget
           </div>
-          <div className="text-2xl font-bold text-emerald-400">${adaptationBudget.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-emerald-400 font-orbitron tabular-nums">${adaptationBudget.toLocaleString()}</div>
           <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">To reduce risk score to &lt; 45</div>
         </div>
 
@@ -65,7 +65,7 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
           <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
             <FileText className="w-3 h-3 text-orange-400" /> Insurance Premium
           </div>
-          <div className="text-2xl font-bold text-orange-400">+34% by 2035</div>
+          <div className="text-2xl font-bold text-orange-400 font-orbitron tabular-nums">+34% by 2035</div>
           <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">Based on trajectory</div>
         </div>
 
@@ -74,7 +74,7 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
           <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
             <TrendingUp className="w-3 h-3 text-emerald-400" /> Adaptation ROI
           </div>
-          <div className="text-2xl font-bold text-emerald-400">+{analysisData.adaptationROI}%</div>
+          <div className="text-2xl font-bold text-emerald-400 font-orbitron tabular-nums">+{analysisData.adaptationROI}%</div>
           <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">Return on resilience spend</div>
         </div>
 
@@ -83,7 +83,7 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
           <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
             <Zap className="w-3 h-3 text-cyan-400" /> Green Premium
           </div>
-          <div className="text-2xl font-bold text-cyan-400">+{analysisData.greenPremiumPercent}%</div>
+          <div className="text-2xl font-bold text-cyan-400 font-orbitron tabular-nums">+{analysisData.greenPremiumPercent}%</div>
           <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">Market value uplift</div>
         </div>
 
@@ -92,7 +92,7 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
           <div className="flex items-center gap-2 mb-1 text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
             <Globe2 className="w-3 h-3 text-cyan-300" /> Impact Materiality (CO2e)
           </div>
-          <div className="text-2xl font-bold text-cyan-300">{analysisData.impactScore}/100</div>
+          <div className="text-2xl font-bold text-cyan-300 font-orbitron tabular-nums">{analysisData.impactScore}/100</div>
           <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">
             Building-on-Planet Impact
           </div>
@@ -108,14 +108,14 @@ const KpiSummary = ({ assetValue, analysisData }: KpiSummaryProps) => {
               🟢 LIVE DATA
             </span>
           </div>
-          <div className="text-2xl font-bold text-amber-300">
+          <div className="text-2xl font-bold text-amber-300 font-orbitron tabular-nums">
             {analysisData.solarPotential}%</div>
           <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tight">
             Asset Adaptation Opportunity
           </div>
         </div>
       </div>
-    </> /* THIS IS THE MISSING CLOSING TAG YOU NEEDED! */
+    </>
   );
 };
 

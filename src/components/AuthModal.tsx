@@ -58,7 +58,7 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
         </DialogHeader>
         <div className="mt-4 space-y-4">
           <p className="text-xs text-muted-foreground">
-            Access ClimateVault&apos;s institutional ESG analytics. Use your work email to align with your organisation&apos;s
+            Access TerraQuant&apos;s institutional ESG analytics. Use your work email to align with your organisation&apos;s
             reporting credentials.
           </p>
           <div className="space-y-2">
@@ -105,7 +105,7 @@ const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
             </Button>
           </div>
           <p className="text-[10px] text-muted-foreground mt-1">
-            By continuing you agree to ClimateVault&apos;s terms of use and acknowledge that this report does not constitute
+            By continuing you agree to TerraQuant&apos;s terms of use and acknowledge that this report does not constitute
             investment advice.
           </p>
         </div>

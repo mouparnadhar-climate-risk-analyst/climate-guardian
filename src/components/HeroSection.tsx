@@ -4,6 +4,9 @@ const HeroSection = () => {
   return (
     <section className="pt-24 pb-8 md:pb-12">
       <div className="container text-center">
+        <p className="text-xs md:text-sm font-orbitron tracking-[0.35em] text-primary/90 uppercase mb-3">
+          TerraQuant
+        </p>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

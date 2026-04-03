@@ -12,7 +12,7 @@ import type { Session } from "@supabase/supabase-js";
 const VaultLogo = () => (
   <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="2" y="2" width="32" height="32" rx="4" stroke="white" strokeWidth="2" fill="none" />
-    <text x="50%" y="55%" dominantBaseline="middle" textAnchor="middle" fill="hsl(190, 100%, 50%)" fontSize="18" fontWeight="700" fontFamily="Inter">C</text>
+    <text x="50%" y="55%" dominantBaseline="middle" textAnchor="middle" fill="hsl(190, 100%, 50%)" fontSize="18" fontWeight="700" fontFamily="Orbitron, sans-serif">T</text>
   </svg>
 );
 
@@ -72,7 +72,7 @@ const Navbar = ({ onDemo, onHistorySelect }: NavbarProps) => {
         {/* FIX: Centered Logo on mobile, left aligned on desktop */}
         <div className="flex items-center justify-center w-full md:w-auto md:justify-start gap-2 md:gap-3 shrink-0">
           <VaultLogo />
-          <span className="text-base md:text-lg font-bold tracking-wider text-foreground">CLIMATEVAULT</span>
+          <span className="text-base md:text-lg font-bold tracking-wider text-foreground font-orbitron">TERRAQUANT</span>
         </div>
 
         {/* FIX: Centered Buttons on mobile, right aligned on desktop */}

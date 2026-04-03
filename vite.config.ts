@@ -41,11 +41,11 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       manifest: {
-        name: "ClimateVault",
-        short_name: "ClimateVault",
+        name: "TerraQuant",
+        short_name: "TerraQuant",
         description: "Know Your Asset's Future Before the Market Does",
-        theme_color: "#0A0F1E",
-        background_color: "#0A0F1E",
+        theme_color: "#000000",
+        background_color: "#000000",
         display: "standalone",
         start_url: "/",
         icons: [

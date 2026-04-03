@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,35 +6,35 @@
 
 @layer base {
   :root {
-    --background: 222 60% 8%;
+    --background: 0 0% 0%;
     --foreground: 0 0% 100%;
-    --card: 222 40% 12%;
+    --card: 222 40% 8%;
     --card-foreground: 0 0% 100%;
-    --popover: 222 40% 12%;
+    --popover: 222 40% 8%;
     --popover-foreground: 0 0% 100%;
     --primary: 190 100% 50%;
-    --primary-foreground: 222 60% 8%;
-    --secondary: 222 30% 18%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 222 30% 12%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 222 30% 18%;
-    --muted-foreground: 220 20% 60%;
+    --muted: 222 30% 14%;
+    --muted-foreground: 220 20% 55%;
     --accent: 190 100% 50%;
-    --accent-foreground: 222 60% 8%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --warning: 20 100% 60%;
     --warning-foreground: 0 0% 100%;
-    --border: 222 30% 20%;
-    --input: 222 30% 20%;
+    --border: 222 30% 16%;
+    --input: 222 30% 16%;
     --ring: 190 100% 50%;
     --radius: 0.75rem;
-    --sidebar-background: 222 40% 10%;
+    --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 190 100% 50%;
-    --sidebar-primary-foreground: 222 60% 8%;
-    --sidebar-accent: 222 30% 18%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 222 30% 12%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 222 30% 20%;
+    --sidebar-border: 222 30% 16%;
     --sidebar-ring: 190 100% 50%;
 
     --glow-primary: 0 0 20px hsl(190 100% 50% / 0.3);
@@ -50,8 +50,35 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-black text-foreground font-sans min-h-screen;
     font-family: 'Inter', sans-serif;
+    background-color: #000000;
+  }
+}
+
+/* Tactical “live monitor” scanline overlay — applied via App wrapper */
+.app-scanline-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 212, 255, 0.02) 2px,
+    rgba(0, 212, 255, 0.02) 3px
+  );
+  animation: scanline-drift 10s linear infinite;
+  mix-blend-mode: overlay;
+}
+
+@keyframes scanline-drift {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(4px);
   }
 }
 

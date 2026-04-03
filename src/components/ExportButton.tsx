@@ -21,7 +21,7 @@ const ExportButton = ({ data, assetValue }: ExportButtonProps) => {
     const addFooter = () => {
       doc.setFontSize(9);
       doc.setTextColor(150);
-      doc.text(`ClimateVault Confidential ESG Intelligence | Page ${pageNum}`, margin, 285);
+      doc.text(`TerraQuant Confidential ESG Intelligence | Page ${pageNum}`, margin, 285);
     };
 
     // Helper: Prevent Overlapping Text
@@ -43,7 +43,7 @@ const ExportButton = ({ data, assetValue }: ExportButtonProps) => {
     doc.setTextColor(0, 212, 255); // Cyan
     doc.setFont("helvetica", "bold");
     doc.setFontSize(28);
-    doc.text("CLIMATEVAULT", margin, 80);
+    doc.text("TERRAQUANT", margin, 80);
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
@@ -157,7 +157,7 @@ const ExportButton = ({ data, assetValue }: ExportButtonProps) => {
     addText(`Executing a credible decarbonization roadmap positions the asset for a market value uplift compared to local brown peers, attracting ESG-screened capital.`);
 
     addFooter(); // Add footer to the last page
-    doc.save(`ClimateVault_ESG_Report_${data.location.lat}.pdf`);
+    doc.save(`TerraQuant_ESG_Report_${data.location.lat}.pdf`);
   };
 
   const handleCSVExport = () => {
@@ -166,7 +166,7 @@ const ExportButton = ({ data, assetValue }: ExportButtonProps) => {
     const row =[`"${data.location.displayName}"`, data.location.lat, data.location.lng, valueNum, data.overallScore, data.riskLevel, data.climate.maxWindSpeed, data.climate.heatStressDays, data.earthquake.count, data.elevation.elevation, data.coastal.distanceKm, data.adaptationROI, data.greenPremiumPercent].join(",");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + headers + row));
-    link.setAttribute("download", `ClimateVault_Data_${data.location.lat}.csv`);
+    link.setAttribute("download", `TerraQuant_Data_${data.location.lat}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

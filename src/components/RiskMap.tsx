@@ -1,45 +1,32 @@
-import { useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Circle, Marker, useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { useEffect, useMemo, useRef } from "react";
+import Map, { Marker, Source, Layer } from "react-map-gl/mapbox";
+import type { MapRef } from "react-map-gl";
+import { circle } from "@turf/circle";
+import type { FeatureCollection, Polygon } from "geojson";
+import "mapbox-gl/dist/mapbox-gl.css";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoibW91cGFybmEyMyIsImEiOiJjbW01MmJmNm8wMjY3MnNzOHk1Z25xeGt5In0.Ub3jY06rWrgwwJGDQV1K9Q";
+const MAPBOX_TOKEN =
+  "pk.eyJ1IjoibW91cGFybmEyMyIsImEiOiJjbW01MmJmNm8wMjY3MnNzOHk1Z25xeGt5In0.Ub3jY06rWrgwwJGDQV1K9Q";
 
-const TILE_URL = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`;
+const DEFAULT_VIEW = {
+  longitude: 55.2708,
+  latitude: 25.2048,
+  zoom: 2,
+  pitch: 0,
+  bearing: 0,
+};
 
-const DEFAULT_CENTER: [number, number] = [25.2048, 55.2708];
-const DEFAULT_ZOOM = 11;
-
-const cyanIcon = new L.DivIcon({
-  className: "",
-  html: `<div style="
-    width: 20px; height: 20px; 
-    background: hsl(190 100% 50%); 
-    border-radius: 50%; 
-    box-shadow: 0 0 16px 6px hsl(190 100% 50% / 0.6), 0 0 40px 12px hsl(190 100% 50% / 0.25);
-    border: 2px solid white;
-  "></div>`,
-  iconSize: [20, 20],
-  iconAnchor: [10, 10],
-});
+/** Dark space atmosphere (Mapbox GL fog) */
+const MAP_FOG = {
+  range: [0.8, 8] as [number, number],
+  color: "#030a04",
+  "high-color": "#000000",
+  "space-color": "#000000",
+  "star-intensity": 0.8,
+};
 
 interface RiskMapProps {
   analysisLocation: { lat: number; lng: number } | null;
-}
-
-function FlyToLocation({ location }: { location: { lat: number; lng: number } }) {
-  const map = useMap();
-  const hasFlewRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    const key = `${location.lat},${location.lng}`;
-    if (hasFlewRef.current !== key) {
-      hasFlewRef.current = key;
-      map.flyTo([location.lat, location.lng], 13, { duration: 2 });
-    }
-  }, [location, map]);
-
-  return null;
 }
 
 const MapLegend = () => (
@@ -61,44 +48,92 @@ const MapLegend = () => (
 );
 
 const RiskMap = ({ analysisLocation }: RiskMapProps) => {
+  const mapRef = useRef<MapRef>(null);
+
+  const riskZonesGeoJson = useMemo<FeatureCollection<Polygon> | null>(() => {
+    if (!analysisLocation) return null;
+    const center: [number, number] = [analysisLocation.lng, analysisLocation.lat];
+    return {
+      type: "FeatureCollection",
+      features: [
+        circle(center, 0.5, { units: "kilometers", steps: 64, properties: { tier: "extreme" } }),
+        circle(center, 1.5, { units: "kilometers", steps: 64, properties: { tier: "high" } }),
+        circle(center, 3, { units: "kilometers", steps: 64, properties: { tier: "moderate" } }),
+      ],
+    };
+  }, [analysisLocation]);
+
+  useEffect(() => {
+    if (!analysisLocation) return;
+    mapRef.current?.flyTo({
+      center: [analysisLocation.lng, analysisLocation.lat],
+      zoom: 13,
+      pitch: 60,
+      bearing: 20,
+      duration: 4000,
+      essential: true,
+    });
+  }, [analysisLocation]);
+
   return (
     <div className="rounded-lg border border-border overflow-hidden h-[300px] md:h-[500px] relative">
-      <MapContainer
-        center={DEFAULT_CENTER}
-        zoom={DEFAULT_ZOOM}
-        className="h-full w-full"
-        zoomControl={false}
-        attributionControl={true}
+      <Map
+        ref={mapRef}
+        mapboxAccessToken={MAPBOX_TOKEN}
+        mapStyle="mapbox://styles/mapbox/dark-v11"
+        initialViewState={DEFAULT_VIEW}
+        projection="globe"
+        fog={MAP_FOG}
+        style={{ width: "100%", height: "100%" }}
+        reuseMaps
       >
-        <TileLayer
-          url={TILE_URL}
-          attribution="&copy; Mapbox &copy; OpenStreetMap"
-          tileSize={512}
-          zoomOffset={-1}
-        />
-
-        {analysisLocation && (
+        {analysisLocation && riskZonesGeoJson && (
           <>
-            <FlyToLocation location={analysisLocation} />
-            <Marker position={[analysisLocation.lat, analysisLocation.lng]} icon={cyanIcon} />
-            <Circle
-              center={[analysisLocation.lat, analysisLocation.lng]}
-              radius={3000}
-              pathOptions={{ color: "hsl(50, 100%, 50%)", fillColor: "hsl(50, 100%, 50%)", fillOpacity: 0.1, weight: 1 }}
-            />
-            <Circle
-              center={[analysisLocation.lat, analysisLocation.lng]}
-              radius={1500}
-              pathOptions={{ color: "hsl(20, 100%, 60%)", fillColor: "hsl(20, 100%, 60%)", fillOpacity: 0.15, weight: 1 }}
-            />
-            <Circle
-              center={[analysisLocation.lat, analysisLocation.lng]}
-              radius={500}
-              pathOptions={{ color: "hsl(0, 84%, 60%)", fillColor: "hsl(0, 84%, 60%)", fillOpacity: 0.25, weight: 1 }}
-            />
+            <Source id="risk-zones" type="geojson" data={riskZonesGeoJson}>
+              {/* Paint largest ring first (bottom), smallest last (top) */}
+              <Layer
+                id="risk-moderate"
+                type="fill"
+                filter={["==", ["get", "tier"], "moderate"]}
+                paint={{
+                  "fill-color": "hsl(50, 100%, 50%)",
+                  "fill-opacity": 0.1,
+                }}
+              />
+              <Layer
+                id="risk-high"
+                type="fill"
+                filter={["==", ["get", "tier"], "high"]}
+                paint={{
+                  "fill-color": "hsl(20, 100%, 60%)",
+                  "fill-opacity": 0.15,
+                }}
+              />
+              <Layer
+                id="risk-extreme"
+                type="fill"
+                filter={["==", ["get", "tier"], "extreme"]}
+                paint={{
+                  "fill-color": "hsl(0, 84%, 60%)",
+                  "fill-opacity": 0.25,
+                }}
+              />
+            </Source>
+            <Marker longitude={analysisLocation.lng} latitude={analysisLocation.lat} anchor="center">
+              <div
+                className="rounded-full border-2 border-white"
+                style={{
+                  width: 20,
+                  height: 20,
+                  background: "hsl(190 100% 50%)",
+                  boxShadow:
+                    "0 0 16px 6px hsl(190 100% 50% / 0.6), 0 0 40px 12px hsl(190 100% 50% / 0.25)",
+                }}
+              />
+            </Marker>
           </>
         )}
-      </MapContainer>
+      </Map>
 
       {analysisLocation && <MapLegend />}
     </div>
