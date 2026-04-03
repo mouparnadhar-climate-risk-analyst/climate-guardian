@@ -1,10 +1,10 @@
-# 🛡️ ClimateVault
+# 🛡️ TerraQuant
 
 > **Institutional-Grade Climate Risk Intelligence & Double Materiality Disclosure.**
 
 ![ClimateVault Interface](https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop)
 
-**ClimateVault** is a high-performance ESG (Environmental, Social, and Governance) intelligence platform architected for global real estate institutional fund managers. Designed to meet **2026 ESRS (European Sustainability Reporting Standards)** requirements, it synthesizes real-time geospatial data into actionable financial modeling, carbon impact analysis, and automated compliance reporting.
+**TerraQuant** is a high-performance ESG (Environmental, Social, and Governance) intelligence platform architected for global real estate institutional fund managers. Designed to meet **2026 ESRS (European Sustainability Reporting Standards)** requirements, it synthesizes real-time geospatial data into actionable financial modeling, carbon impact analysis, and automated compliance reporting.
 
 🔗 **[Launch Live Application](https://climate-guardian-blond.vercel.app/)** 
 
